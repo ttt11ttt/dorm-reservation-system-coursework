@@ -1,0 +1,37 @@
+<view class="page">
+  <view class="banner">
+    <text class="eyebrow">本人复诊计划</text>
+    <text class="title">我的复诊计划</text>
+    <text class="note">仅显示服务端为当前患者返回的复诊计划摘要。</text>
+  </view>
+
+  <view class="card filter-card">
+    <text class="filter-label">计划状态</text>
+    <picker mode="selector" range="{{filters}}" range-key="label" value="{{filterIndex}}" bindchange="onFilterChange">
+      <view class="picker">{{filterLabel}} <text class="chevron">⌄</text></view>
+    </picker>
+    <text wx:if="{{asOfDate}}" class="as-of">服务端日期（上海）：{{asOfDate}}</text>
+  </view>
+
+  <view wx:if="{{loading && items.length === 0}}" class="card state">正在读取本人复诊计划…</view>
+  <view wx:elif="{{!loading && items.length === 0 && !error}}" class="card state empty">当前筛选下没有复诊计划。</view>
+
+  <view wx:for="{{items}}" wx:key="followup_plan_id" class="card plan-card" data-id="{{item.followup_plan_id}}" bindtap="openDetail">
+    <view class="plan-heading">
+      <text class="plan-date">建议日期 {{item.suggested_date}}</text>
+      <text class="status">{{item.status}}</text>
+    </view>
+    <text class="recommendation">{{item.recommendation}}</text>
+    <view class="plan-meta">
+      <text class="plan-id">计划编号 {{item.followup_plan_id}}</text>
+      <text class="overdue {{item.overdue ? 'overdue-yes' : ''}}">逾期：{{item.overdue ? '是' : '否'}}</text>
+    </view>
+    <text class="open-link">查看计划详情 ›</text>
+  </view>
+
+  <view wx:if="{{loadingMore}}" class="state">正在读取下一页…</view>
+  <button wx:if="{{hasMore && !loading && !loadingMore}}" class="secondary more-button" bindtap="loadNextPage">加载更多</button>
+  <view wx:if="{{error}}" class="error"><text>{{error}}</text><button class="retry-button" loading="{{loading || loadingMore}}" disabled="{{loading || loadingMore}}" bindtap="retryList">重新读取计划</button></view>
+  <button class="back-button" bindtap="goHome">返回患者服务</button>
+  <text class="footnote">计划状态和逾期标记均来自服务端；本页不根据预约或联系记录推断完成，也不表示提醒已发送。已有预约可在“我的预约”中独立查看。</text>
+</view>

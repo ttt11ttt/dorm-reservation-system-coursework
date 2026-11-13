@@ -1,0 +1,25 @@
+<view class="page">
+  <view class="banner">
+    <text class="eyebrow">ADC 门诊预约</text>
+    <text class="title">预约详情</text>
+    <text class="note">访客预约记录只对创建预约的微信主体开放。</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="card state">正在读取本人预约详情…</view>
+  <view wx:if="{{reservation}}" class="card detail-card">
+    <text class="status">{{reservation.verificationLabel}}</text>
+    <view class="row"><text class="label">预约号</text><text class="value">{{reservation.reservation_no}}</text></view>
+    <view class="row"><text class="label">预约时间</text><text class="value">{{reservation.displayStart}} – {{reservation.displayEnd}}（上海时间）</text></view>
+    <view class="row"><text class="label">联系人</text><text class="value">{{reservation.contact_name}}</text></view>
+    <view class="row"><text class="label">联系电话</text><text class="value">{{reservation.contact_phone}}</text></view>
+    <view class="row block-row"><text class="label">本次就诊需求</text><text class="value multiline">{{reservation.requested_treatments}}</text></view>
+    <view wx:if="{{reservation.special_needs}}" class="row block-row"><text class="label">其他安排</text><text class="value multiline">{{reservation.special_needs}}</text></view>
+  </view>
+
+  <view class="notice">访客预约不读取患者档案。医疗身份及后续诊疗信息由门店按实际流程在到店后核验。</view>
+  <view wx:if="{{error}}" class="error"><text>{{error}}</text><button class="primary" loading="{{loading}}" disabled="{{loading}}" bindtap="retry">重新读取</button></view>
+  <view wx:if="{{reservation.reservation_status === '待到诊'}}" class="card">
+    <button class="primary" disabled="{{loading || changing}}" bindtap="reschedule">更换预约时段</button>
+    <button class="secondary" disabled="{{loading || changing}}" bindtap="cancel">取消预约</button>
+  </view>
+</view>

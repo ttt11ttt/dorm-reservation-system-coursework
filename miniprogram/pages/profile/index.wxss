@@ -1,0 +1,21 @@
+.profile { padding: 24rpx; }
+.card { padding: 24rpx; background: white; border-radius: 16rpx; margin-bottom: 20rpx; }
+.title { font-size: 32rpx; font-weight: 700; margin-bottom: 16rpx; }
+label { display: block; margin-bottom: 14rpx; }
+input { background: #f1f7f4; padding: 12rpx; min-height: 40rpx; }
+.allergy, .note, .error, .notice { padding: 12rpx 0; }
+.error { color: #ad3525; }
+
+/* ===== 科技蓝主题覆盖（2026-11-11） ===== */
+page { background: #f4f8fe; color: #0b1b33; }
+.profile { padding: 24rpx 28rpx 60rpx; }
+.card { background: #fff; border-radius: 28rpx; padding: 26rpx; box-shadow: 0 8rpx 24rpx rgba(20,50,110,.06); border: 0; }
+.title { font-size: 28rpx; font-weight: 800; color: #0b1b33; margin-bottom: 16rpx; }
+label { display: block; font-size: 23rpx; color: #8c99ac; margin: 14rpx 0 8rpx; }
+input { height: 78rpx; background: #f7faff; border: 2rpx solid #e8eef8; border-radius: 18rpx; padding: 0 20rpx; font-size: 26rpx; }
+textarea { background: #f7faff; border: 2rpx solid #e8eef8; border-radius: 18rpx; padding: 16rpx 20rpx; }
+button[type="primary"], button { background: linear-gradient(90deg, #2f6bff, #18b6ff) !important; color: #fff !important; border-radius: 20rpx; font-weight: 700; }
+button[size="mini"] { background: #eef4ff !important; color: #2f6bff !important; border-radius: 14rpx; }
+.allergy input { margin-bottom: 10rpx; }
+.note, .notice { color: #8c99ac; }
+.error { background: #fdeeea; color: #b7452f; border-radius: 20rpx; }

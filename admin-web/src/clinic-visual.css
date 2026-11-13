@@ -1,0 +1,83 @@
+:root {
+  --brand: #08786c;
+  --ink: #183833;
+  --muted: #526e68;
+  --line: #dce8e4;
+  --bg: #f3f7f5;
+  --soft: #e3f3ec;
+}
+
+.approved-shell .sidebar { background: #fcfefd; padding-top: 22px; }
+.approved-shell .sidebar .logo { padding-bottom: 16px; }
+.approved-shell .nav-group { margin-bottom: 8px; }
+.approved-shell .navlabel {
+  margin: 7px 12px 4px;
+  color: #566f69;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: .08em;
+}
+.approved-shell .nav-group button {
+  width: 100%;
+  min-height: 37px;
+  padding: 7px 12px;
+  margin: 2px 0;
+  color: #45645c;
+  border: 1px solid transparent;
+}
+.approved-shell .nav-group button.active {
+  background: #e0f2eb;
+  color: #075d52;
+  border-color: #c9e9dd;
+}
+.approved-shell .navicon { color: #20766a; }
+.approved-shell .sidehelp { display: none; }
+.approved-shell .topbar { min-height: 58px; height: auto; padding-block: 12px; }
+.approved-shell .breadcrumb, .approved-shell .today { color: #526e68; }
+.approved-shell .care-switch select { color: #254e45; border-color: #cddfd8; }
+.approved-shell .dashboard-banner {
+  padding: clamp(20px, 3vw, 36px);
+  min-height: 144px;
+  border: 1px solid #cce8dd;
+  border-radius: 18px;
+  background: radial-gradient(ellipse at 92% 0%, #cceee4, transparent 62%), #eaf6ef;
+}
+.approved-shell .dashboard-banner h1 { color: #153e36; font-size: clamp(24px, 3vw, 36px); font-weight: 750; }
+.approved-shell .dashboard-banner .eyebrow { color: #267567; }
+.approved-shell .pagehead .sub { color: #526e68; font-size: 13px; }
+.approved-shell .stats { gap: 14px; }
+.approved-shell .stat { border-top: 3px solid #5ab3a0; box-shadow: 0 3px 12px #16473808; }
+.approved-shell .stat:nth-child(2) { border-top-color: #69a9c6; }
+.approved-shell .stat:nth-child(3) { border-top-color: #dab174; }
+.approved-shell .stat:nth-child(4) { border-top-color: #9ba7d0; }
+.approved-shell .stat label, .approved-shell .statfooter, .approved-shell .stat .number small { color: #546e66; }
+.approved-shell .stat .number { font-size: 34px; }
+.approved-shell .panel { box-shadow: 0 3px 16px #16473808; }
+.approved-shell .paneltitle h2 { color: #183833; font-size: 17px; }
+.approved-shell th { background: #edf5f1; color: #3e5b55; font-weight: 650; }
+.approved-shell td { border-color: #eaf0ed; }
+.approved-shell tbody tr:hover { background: #f4faf7; }
+.approved-shell .textbtn, .approved-shell .secondary { color: #075d52; }
+.approved-shell .badge { background: #e6f3ed; color: #075d52; }
+.approved-shell .badge-warning { background: #fff0d7; color: #87551d; }
+.approved-shell .badge-danger { background: #fcebe9; color: #9b3e38; }
+.approved-shell :is(button, input, select, textarea):focus-visible { outline: 2px solid #08786c; outline-offset: 3px; }
+
+.login-shell .login-aside {
+  background: radial-gradient(ellipse at 85% 8%, #d1eee3, transparent 64%), #edf7f2;
+  color: #173d35;
+}
+.login-shell .login-aside :is(h2, strong, p, small, .eyebrow, .aside-meta) { color: #235d51; }
+.login-shell .login-steps li { border-color: #badbd0; }
+.login-shell .login-steps li > span { background: #d6eee5; color: #155e52; }
+
+@media (max-width: 760px) {
+  .approved-shell .dashboard-banner { align-items: flex-start; flex-wrap: wrap; }
+  .approved-shell .nav-group { display: flex; align-items: center; gap: 6px; margin-bottom: 0; }
+  .approved-shell .nav-group .navlabel { white-space: nowrap; }
+  .approved-shell .nav-group button { width: auto; white-space: nowrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .approved-shell button { transition: none; }
+  .approved-shell button:hover { transform: none; }
+}

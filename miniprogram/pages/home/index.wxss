@@ -1,0 +1,1097 @@
+/* ===== 首页 · 科技蓝版式（2026-11-11） ===== */
+
+page {
+  background: #f4f8fe;
+  color: #0b1b33;
+}
+
+.page {
+  padding: 24rpx 28rpx 180rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* ---------- 问候 ---------- */
+.greet {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8rpx 4rpx 26rpx;
+}
+
+.greet-copy text.hi {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #0b1b33;
+  letter-spacing: -0.5rpx;
+}
+
+.g-sub {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: #8c99ac;
+}
+
+.g-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #12b886;
+  box-shadow: 0 0 0 6rpx rgba(18, 184, 134, 0.16);
+}
+
+.g-right {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+}
+
+.g-ic {
+  position: relative;
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 26rpx;
+  background: #fff;
+  box-shadow: 0 8rpx 24rpx rgba(20, 50, 110, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bell {
+  width: 22rpx;
+  height: 22rpx;
+  border: 4rpx solid #5c6d86;
+  border-radius: 50% 50% 6rpx 6rpx;
+  position: relative;
+  margin-top: -4rpx;
+}
+
+.bell::before {
+  content: '';
+  position: absolute;
+  left: -8rpx;
+  right: -8rpx;
+  bottom: -6rpx;
+  height: 5rpx;
+  border-radius: 4rpx;
+  background: #5c6d86;
+}
+
+.bell::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -14rpx;
+  width: 8rpx;
+  height: 8rpx;
+  margin-left: -4rpx;
+  border-radius: 50%;
+  background: #5c6d86;
+}
+
+.g-badge {
+  position: absolute;
+  top: 16rpx;
+  right: 18rpx;
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: #f04438;
+  border: 3rpx solid #fff;
+}
+
+.g-ava {
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 26rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(145deg, #2f6bff, #18b6ff);
+  box-shadow: 0 12rpx 26rpx rgba(47, 107, 255, 0.3);
+}
+
+/* ---------- 门店条 ---------- */
+.clinic-bar {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 22rpx 24rpx;
+  border-radius: 28rpx;
+  background: #fff;
+  box-shadow: 0 8rpx 24rpx rgba(20, 50, 110, 0.06);
+  margin-bottom: 20rpx;
+}
+
+.cb-ic {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 20rpx;
+  background: #eef4ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.pin {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50% 50% 50% 0;
+  background: #2f6bff;
+  transform: rotate(-45deg);
+  position: relative;
+}
+
+.pin::after {
+  content: '';
+  position: absolute;
+  left: 5rpx;
+  top: 5rpx;
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.cb-txt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.cb-name {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #0b1b33;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cb-sub {
+  font-size: 22rpx;
+  color: #8c99ac;
+}
+
+.cb-switch {
+  font-size: 23rpx;
+  font-weight: 700;
+  color: #2f6bff;
+  flex: none;
+}
+
+/* ---------- 下次就诊 ---------- */
+.next-card {
+  position: relative;
+  background: #fff;
+  border-radius: 32rpx;
+  padding: 26rpx 26rpx 24rpx;
+  box-shadow: 0 12rpx 32rpx rgba(20, 50, 110, 0.09);
+  margin-bottom: 20rpx;
+  overflow: hidden;
+}
+
+.next-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8rpx;
+  background: linear-gradient(180deg, #2f6bff, #18b6ff);
+}
+
+.nc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18rpx;
+}
+
+.nc-label {
+  font-size: 22rpx;
+  letter-spacing: 2rpx;
+  color: #8c99ac;
+  font-weight: 700;
+}
+
+.nc-count {
+  font-size: 21rpx;
+  font-weight: 700;
+  color: #1653c8;
+  background: #e9f1ff;
+  border-radius: 999rpx;
+  padding: 5rpx 16rpx;
+}
+
+.nc-main {
+  display: flex;
+  gap: 22rpx;
+  align-items: center;
+}
+
+.nc-date {
+  flex: none;
+  width: 132rpx;
+  padding: 14rpx 0;
+  border-radius: 22rpx;
+  background: linear-gradient(160deg, #eef4ff, #e2edff);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rpx;
+}
+
+.nc-d {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #1746bd;
+  line-height: 1.1;
+}
+
+.nc-m {
+  font-size: 20rpx;
+  color: #4a6bb0;
+  font-weight: 700;
+}
+
+.nc-t {
+  font-size: 20rpx;
+  color: #4a6bb0;
+  margin-top: 4rpx;
+}
+
+.nc-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.nc-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #0b1b33;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.nc-sub {
+  font-size: 23rpx;
+  color: #8c99ac;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.nc-acts {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 22rpx;
+}
+
+.nc-btn {
+  flex: 1;
+  height: 76rpx;
+  border-radius: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25rpx;
+  font-weight: 750;
+  color: #fff;
+  background: linear-gradient(90deg, #2f6bff, #18b6ff);
+  box-shadow: 0 12rpx 26rpx rgba(47, 107, 255, 0.24);
+}
+
+.nc-btn.ghost {
+  background: #fff;
+  color: #31425c;
+  border: 2rpx solid #e6edf8;
+  box-shadow: none;
+  font-weight: 650;
+}
+
+.next-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  min-height: 120rpx;
+  font-size: 25rpx;
+  color: #8c99ac;
+}
+
+.next-empty-go {
+  color: #2f6bff;
+  font-weight: 700;
+}
+
+/* ---------- 预约条 ---------- */
+.book-banner {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx 26rpx;
+  border-radius: 32rpx;
+  margin-bottom: 18rpx;
+  background: linear-gradient(112deg, #1b3c8f, #2f6bff 60%, #18b6ff);
+  box-shadow: 0 20rpx 40rpx rgba(31, 86, 224, 0.26);
+}
+
+.bb-ic {
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 22rpx;
+  background: rgba(255, 255, 255, 0.18);
+  border: 2rpx solid rgba(255, 255, 255, 0.24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.bb-cal {
+  width: 26rpx;
+  height: 26rpx;
+  border: 4rpx solid #fff;
+  border-radius: 6rpx;
+  border-top-width: 8rpx;
+}
+
+.bb-txt {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.bb-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #fff;
+}
+
+.bb-sub {
+  font-size: 21rpx;
+  color: #cfe1ff;
+}
+
+.bb-go {
+  font-size: 23rpx;
+  font-weight: 800;
+  color: #fff;
+  flex: none;
+}
+
+/* ---------- 公告 ---------- */
+.announcement {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 20rpx;
+  background: #eef7ff;
+  margin-bottom: 8rpx;
+}
+
+.announcement-speaker {
+  width: 22rpx;
+  height: 22rpx;
+  border-radius: 50%;
+  background: #2f6bff;
+  box-shadow: 0 0 0 6rpx rgba(47, 107, 255, 0.14);
+  flex: none;
+}
+
+.announcement-label {
+  font-size: 21rpx;
+  font-weight: 700;
+  color: #2b5aa8;
+}
+
+.announcement-copy {
+  font-size: 21rpx;
+  color: #5c7bb0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 区块标题 ---------- */
+.sec {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 30rpx 6rpx 16rpx;
+}
+
+.sec-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #0b1b33;
+}
+
+.sec-more {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #2f6bff;
+}
+
+/* ---------- 可预约牙医 ---------- */
+.doctor-section {
+  margin-top: 4rpx;
+}
+
+.doc-scroll {
+  white-space: nowrap;
+  width: 100%;
+}
+
+.doc-card {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 10rpx;
+  width: 300rpx;
+  margin-right: 18rpx;
+  padding: 24rpx;
+  border-radius: 28rpx;
+  background: #fff;
+  box-shadow: 0 8rpx 24rpx rgba(20, 50, 110, 0.06);
+  vertical-align: top;
+  white-space: normal;
+}
+
+.doc-top {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.doc-ava {
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #1b4fd8;
+  background: linear-gradient(145deg, #e8f0ff, #d5e6ff);
+  flex: none;
+}
+
+.doc-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.doc-name {
+  font-size: 27rpx;
+  font-weight: 750;
+  color: #0b1b33;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.doc-role {
+  font-size: 20rpx;
+  color: #8c99ac;
+}
+
+.doc-clinic {
+  font-size: 21rpx;
+  color: #5c6d86;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.doc-go {
+  font-size: 22rpx;
+  font-weight: 750;
+  color: #2f6bff;
+}
+
+.doctor-empty-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26rpx;
+  border-radius: 24rpx;
+  background: #fff;
+  font-size: 24rpx;
+  color: #8c99ac;
+}
+
+.empty-link {
+  color: #2f6bff;
+  font-weight: 700;
+}
+
+/* ---------- 热门项目 ---------- */
+.proj-block {
+  margin-top: 4rpx;
+}
+
+.proj-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18rpx;
+}
+
+.pj {
+  background: #fff;
+  border-radius: 26rpx;
+  padding: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(20, 50, 110, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.pj-name {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #0b1b33;
+}
+
+.pj-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+}
+
+.pj-price {
+  font-size: 32rpx;
+  font-weight: 850;
+  color: #0b1b33;
+}
+
+.pj-unit {
+  font-size: 20rpx;
+  color: #8c99ac;
+}
+
+/* ---------- 就诊须知 ---------- */
+.tips {
+  background: #fff;
+  border-radius: 28rpx;
+  padding: 6rpx 26rpx;
+  box-shadow: 0 8rpx 24rpx rgba(20, 50, 110, 0.06);
+}
+
+.tip-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 22rpx 0;
+  border-bottom: 2rpx solid #f0f4fb;
+  font-size: 23rpx;
+  color: #5c6d86;
+}
+
+.tip-row:last-child {
+  border-bottom: 0;
+}
+
+.tip-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #2f6bff;
+  flex: none;
+}
+
+/* ---------- 通用卡片 ---------- */
+.card {
+  background: #fff;
+  border-radius: 28rpx;
+  padding: 26rpx;
+  box-shadow: 0 8rpx 24rpx rgba(20, 50, 110, 0.06);
+  margin-top: 20rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #0b1b33;
+  margin-bottom: 16rpx;
+}
+
+.note {
+  display: block;
+  font-size: 22rpx;
+  color: #8c99ac;
+  line-height: 1.7;
+  margin-bottom: 14rpx;
+}
+
+.muted {
+  font-size: 22rpx;
+  color: #aab6c6;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 12rpx 0;
+  border-bottom: 2rpx solid #f4f7fc;
+}
+
+.row .label {
+  font-size: 23rpx;
+  color: #8c99ac;
+}
+
+.row .value {
+  font-size: 24rpx;
+  color: #0b1b33;
+  font-weight: 650;
+}
+
+.restriction {
+  margin: 14rpx 0;
+  padding: 18rpx;
+  border-radius: 18rpx;
+  background: #fdf6e8;
+  border: 2rpx solid #f7d79a;
+  font-size: 22rpx;
+  color: #8a5a12;
+  line-height: 1.7;
+}
+
+.clinic-phones {
+  margin: 14rpx 0;
+}
+
+.phone-title {
+  display: block;
+  font-size: 23rpx;
+  font-weight: 700;
+  color: #31425c;
+  margin-bottom: 10rpx;
+}
+
+.phone-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 10rpx 0;
+}
+
+.phone-name {
+  font-size: 23rpx;
+  color: #5c6d86;
+}
+
+.phone-button {
+  height: 60rpx;
+  line-height: 60rpx;
+  padding: 0 22rpx;
+  border-radius: 16rpx;
+  font-size: 22rpx;
+  color: #2f6bff;
+  background: #eef4ff;
+  border: 0;
+}
+
+.phone-button::after {
+  border: 0;
+}
+
+.list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.state {
+  padding: 30rpx 0;
+  text-align: center;
+  font-size: 23rpx;
+  color: #aab6c6;
+}
+
+.appointment-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 22rpx 0;
+  border-bottom: 2rpx solid #f4f7fc;
+}
+
+.appointment-row:last-child {
+  border-bottom: 0;
+}
+
+.appointment-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.appointment-number {
+  font-size: 24rpx;
+  font-weight: 750;
+  color: #0b1b33;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.appointment-status,
+.appointment-time {
+  font-size: 22rpx;
+  color: #8c99ac;
+}
+
+.chevron {
+  font-size: 32rpx;
+  color: #c3cedd;
+}
+
+.pending-card {
+  margin-top: 20rpx;
+  padding: 26rpx;
+  border-radius: 26rpx;
+  background: #fff8e7;
+  border: 2rpx solid #dfbf73;
+}
+
+.pending-title {
+  display: block;
+  font-size: 27rpx;
+  font-weight: 800;
+  color: #725111;
+  margin-bottom: 10rpx;
+}
+
+.identity-card .section-title {
+  margin-bottom: 10rpx;
+}
+
+/* ---------- 按钮 ---------- */
+.page button.primary,
+.page button[type='primary'] {
+  background: linear-gradient(90deg, #2f6bff, #18b6ff) !important;
+  color: #fff !important;
+  border-radius: 20rpx;
+  font-size: 26rpx;
+  font-weight: 750;
+  border: 0;
+}
+
+.page button.secondary {
+  background: #fff;
+  color: #31425c;
+  border: 2rpx solid #e6edf8;
+  border-radius: 20rpx;
+  font-size: 25rpx;
+  font-weight: 650;
+  margin-top: 14rpx;
+}
+
+.page button.secondary::after,
+.page button.primary::after {
+  border: 0;
+}
+
+.error {
+  margin-top: 20rpx;
+  padding: 22rpx;
+  border-radius: 22rpx;
+  background: #fdeeea;
+  color: #b7452f;
+  font-size: 23rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.retry-button {
+  align-self: flex-start;
+  height: 60rpx;
+  line-height: 60rpx;
+  padding: 0 24rpx;
+  border-radius: 16rpx;
+  background: #fff;
+  color: #b7452f;
+  font-size: 22rpx;
+  border: 2rpx solid #f3c7bd;
+}
+
+.footnote {
+  display: block;
+  margin: 26rpx 6rpx 0;
+  font-size: 20rpx;
+  color: #b3bfcd;
+  line-height: 1.7;
+}
+
+/* ---------- 底部导航 ---------- */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20rpx);
+  border-top: 2rpx solid #e6edf8;
+  z-index: 20;
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+  font-size: 21rpx;
+  color: #aab6c6;
+}
+
+.nav-active {
+  color: #2f6bff;
+  font-weight: 750;
+}
+
+.nav-icon {
+  width: 44rpx;
+  height: 44rpx;
+  position: relative;
+}
+
+.nav-home-roof {
+  position: absolute;
+  left: 4rpx;
+  top: 4rpx;
+  width: 30rpx;
+  height: 30rpx;
+  border-radius: 8rpx;
+  background: transparent;
+  border: 4rpx solid currentColor;
+  border-right: 0;
+  border-bottom: 0;
+  transform: rotate(45deg);
+}
+
+.nav-home-base {
+  position: absolute;
+  left: 9rpx;
+  top: 20rpx;
+  width: 26rpx;
+  height: 20rpx;
+  border: 4rpx solid currentColor;
+  border-top: 0;
+  border-radius: 0 0 8rpx 8rpx;
+}
+
+.nav-person-head {
+  position: absolute;
+  left: 14rpx;
+  top: 3rpx;
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  border: 4rpx solid currentColor;
+}
+
+.nav-person-body {
+  position: absolute;
+  left: 7rpx;
+  top: 24rpx;
+  width: 30rpx;
+  height: 18rpx;
+  border: 4rpx solid currentColor;
+  border-bottom: 0;
+  border-radius: 16rpx 16rpx 0 0;
+}
+
+/* ---------- 首页主视觉 ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 36rpx;
+  padding: 34rpx 30rpx 32rpx;
+  margin-bottom: 20rpx;
+  min-height: 300rpx;
+  background:
+    radial-gradient(120% 130% at 92% 4%, rgba(255, 255, 255, 0.22), transparent 46%),
+    linear-gradient(118deg, #16307a 0%, #2f6bff 55%, #18b6ff 100%);
+  box-shadow: 0 22rpx 44rpx rgba(24, 60, 160, 0.30);
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  max-width: 66%;
+}
+
+.hero-kick {
+  font-size: 20rpx;
+  letter-spacing: 3rpx;
+  color: #a9c8ff;
+  font-weight: 750;
+}
+
+.hero-title {
+  margin: 12rpx 0 8rpx;
+  font-size: 46rpx;
+  line-height: 1.24;
+  font-weight: 850;
+  color: #fff;
+  letter-spacing: -0.5rpx;
+}
+
+.hero-sub {
+  font-size: 23rpx;
+  line-height: 1.6;
+  color: #cfe1ff;
+}
+
+.hero-acts {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 26rpx;
+}
+
+.hero-btn {
+  height: 72rpx;
+  padding: 0 32rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25rpx;
+  font-weight: 800;
+  color: #1653c8;
+  background: #fff;
+  box-shadow: 0 12rpx 26rpx rgba(6, 28, 80, 0.22);
+}
+
+.hero-btn.ghost {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  border: 2rpx solid rgba(255, 255, 255, 0.34);
+  box-shadow: none;
+}
+
+.hero-link {
+  display: inline-block;
+  margin-top: 18rpx;
+  font-size: 22rpx;
+  color: #cfe1ff;
+  font-weight: 650;
+}
+
+.hero-art {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 260rpx;
+  height: 280rpx;
+  z-index: 1;
+}
+
+.hero-ring {
+  position: absolute;
+  right: -70rpx;
+  top: -30rpx;
+  width: 240rpx;
+  height: 240rpx;
+  border-radius: 50%;
+  border: 26rpx solid rgba(255, 255, 255, 0.10);
+}
+
+.hero-cal {
+  position: absolute;
+  right: 46rpx;
+  bottom: 34rpx;
+  width: 124rpx;
+  height: 116rpx;
+  border-radius: 18rpx;
+  background: #fff;
+  box-shadow: 0 16rpx 30rpx rgba(6, 28, 80, 0.28);
+  overflow: hidden;
+  transform: rotate(-6deg);
+}
+
+.hero-cal-bar {
+  height: 26rpx;
+  background: #dbe7ff;
+}
+
+.hero-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8rpx;
+  padding: 12rpx;
+}
+
+.hero-cal-grid view {
+  height: 14rpx;
+  border-radius: 4rpx;
+  background: #eef3fb;
+}
+
+.hero-cal-grid view.hero-cal-on {
+  background: #2f6bff;
+}
+
+.hero-check {
+  position: absolute;
+  right: 26rpx;
+  bottom: 20rpx;
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: #12b886;
+  box-shadow: 0 10rpx 22rpx rgba(6, 90, 60, 0.30);
+}
+
+.hero-check::after {
+  content: '';
+  position: absolute;
+  left: 15rpx;
+  top: 17rpx;
+  width: 18rpx;
+  height: 10rpx;
+  border-left: 5rpx solid #fff;
+  border-bottom: 5rpx solid #fff;
+  transform: rotate(-45deg);
+}
+
+.sec-title { display: flex; align-items: center; }
+.sec-title::before { content: ''; width: 8rpx; height: 26rpx; border-radius: 4rpx; margin-right: 12rpx; background: linear-gradient(180deg, #2f6bff, #18b6ff); }

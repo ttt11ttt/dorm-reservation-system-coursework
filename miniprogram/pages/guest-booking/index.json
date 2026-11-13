@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "预约联系人",
+  "navigationBarTextStyle": "black",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f4f8fe",
+  "navigationBarBackgroundColor": "#ffffff"
+}

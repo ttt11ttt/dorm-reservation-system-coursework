@@ -1,0 +1,61 @@
+page {
+  min-height: 100%;
+  background: #f3f7f5;
+  color: #183a32;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.55;
+}
+button {
+  box-sizing: border-box;
+  min-height: 88rpx;
+  padding: 18rpx 24rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  line-height: 1.4;
+  white-space: normal;
+}
+button::after { border: 0; }
+button[disabled] { opacity: .5; }
+input, textarea { box-sizing: border-box; color: #183a32; }
+.retry-button { color: #205e4c; background: #edf5f1; }
+/* ===== 国赛科技蓝主题覆盖（2026-11-11） =====
+   统一后台与小程序视觉：深蓝主色 + 科技蓝渐变 + 白色卡片 */
+page{ background:#f4f8fe; color:#0b1b33; }
+
+/* 首页主视觉 */
+page .clinic-showcase{
+  border-radius:28rpx;
+  background:
+    radial-gradient(120% 140% at 88% 10%, rgba(255,255,255,.18), transparent 42%),
+    linear-gradient(112deg,#1b3c8f 0%,#2f6bff 55%,#18b6ff 100%);
+  box-shadow:0 24rpx 48rpx rgba(31,86,224,.28);
+}
+page .showcase-kicker{ color:#a9c8ff; }
+page .showcase-title{ color:#ffffff; }
+page .showcase-note{ color:#cfe1ff; }
+page .showcase-button{ background:#ffffff !important; color:#1653c8 !important; border:0 !important; border-radius:16rpx; font-weight:800; }
+page .registration-hero{ background:linear-gradient(112deg,#1b3c8f,#2f6bff 60%,#18b6ff); border-radius:28rpx; }
+
+/* 卡片与列表 */
+page .card, page .panel{ border-radius:22rpx; box-shadow:0 6rpx 24rpx rgba(24,60,120,.06); }
+page .status:not(.full){ color:#2f6bff; }
+page .go{ background:#2f6bff !important; }
+
+/* 目录页时段与日期条 */
+page .slots button{ background:#e9f1ff !important; color:#1653c8 !important; border-radius:12rpx; }
+page .slots button[disabled]{ background:#eef2f8 !important; color:#9aa8bd !important; }
+page .date.selected{ background:#e9f1ff !important; color:#1653c8 !important; border-bottom-color:#2f6bff !important; }
+
+/* 主要按钮统一为科技蓝渐变 */
+page button.primary, page .primary, page button[type="primary"]{
+  background:linear-gradient(90deg,#2f6bff,#18b6ff) !important;
+  color:#ffffff !important;
+  border-radius:16rpx;
+}
+
+/* 品牌与次级强调色统一到科技蓝 */
+page .brand-mark{ background:linear-gradient(145deg,#2f6bff,#18b6ff) !important; border-radius:20rpx !important; }
+page .doctor-action{ color:#2f6bff !important; }
+page .service-icon{ background:#e9f1ff !important; }
+page .more-link{ color:#2f6bff !important; }
+page .empty-doctor-link{ color:#2f6bff !important; }

@@ -1,0 +1,74 @@
+page{background:#fff;color:#222}.catalog-page{min-height:100vh;padding-bottom:40rpx;font-size:28rpx}.search{margin:48rpx 26rpx 24rpx;background:#f5f5f5;border-radius:40rpx;display:flex;height:72rpx;overflow:hidden}.search input{flex:1;padding:0 30rpx;min-width:0;height:72rpx}.search button{margin:0;border-radius:0;background:#ddd;color:#777;width:92rpx;padding:0;font-size:48rpx;line-height:64rpx}.date-strip{white-space:nowrap;border-bottom:8rpx solid #f7f7f7;padding:12rpx 0;background:#fff}.date-label,.date{display:inline-flex;vertical-align:middle;flex-direction:column;justify-content:center;text-align:center;width:96rpx;height:82rpx;font-size:24rpx;color:#888}.date-label{width:76rpx;font-weight:bold;color:#333}.date text{display:block}.date.selected{font-weight:bold;color:#111;background:#e5f8fa;border-bottom:4rpx solid #49ccd2}.list-row{display:flex;align-items:center;position:relative;padding:28rpx 26rpx;border-bottom:2rpx solid #f1f1f1;min-height:92rpx;overflow:hidden}.clinic-logo{width:88rpx;height:88rpx;border:2rpx solid #9acfd2;border-radius:50%;color:#51b8bf;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:34rpx}.avatar{width:140rpx;height:140rpx;border-radius:50%;flex-shrink:0;border:1rpx solid #b6dfe0;margin-right:24rpx}.fallback{background:#e5f4f4;color:#82bfc3;display:flex;align-items:center;justify-content:center;font-size:58rpx}.row-copy{flex:1;min-width:0}.clinic-name{font-size:27rpx;line-height:1.5}.name{font-size:31rpx;font-weight:500;margin-right:12rpx}.title{font-size:25rpx}.preview{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;color:#aaa;line-height:1.65;font-size:25rpx;margin-top:8rpx}.status{position:absolute;right:-16rpx;top:18rpx;transform:rotate(45deg);font-size:22rpx;color:#fff;background:#49cdd2;padding:0 24rpx}.go{display:inline-block;background:#40cbd0;color:white;border-radius:8rpx;font-size:24rpx;margin-top:8rpx;padding:1rpx 26rpx}.full{background:#ccc}.detail-head{background:#60d8df;padding:60rpx 16rpx 10rpx}.profile{background:white;border-radius:16rpx;padding:42rpx 22rpx 12rpx;box-shadow:0 6rpx 6rpx #abc4c5}.person{display:flex;align-items:center;margin-bottom:26rpx}.professional{display:block;font-size:26rpx;color:#666;margin-top:10rpx}.intro{font-size:26rpx;line-height:1.8;display:block}.clamped{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}.expand{text-align:right;color:#8dcbcd;font-size:24rpx;padding:4rpx 16rpx}.section{padding:30rpx 20rpx 20rpx;border-bottom:12rpx solid #f7f7f7}.section-title{border-left:8rpx solid #6bd7db;padding-left:14rpx;font-size:31rpx;font-weight:600;margin-bottom:28rpx}.location{padding:24rpx;color:#44868b;font-size:25rpx;border-bottom:2rpx solid #eee}.period{padding:12rpx 0 25rpx;border-bottom:2rpx solid #f2f2f2}.period-heading{font-size:25rpx;line-height:1.8}.remaining{display:block;color:#56b8bd}.address{display:block;color:#888;font-size:23rpx;line-height:1.6}.slots{display:flex;flex-wrap:wrap;margin-top:12rpx;gap:12rpx}.slots button{margin:0;background:#41cbd1;color:#fff;border-radius:32rpx;padding:4rpx 20rpx;font-size:24rpx;line-height:1.8}.slots button[disabled]{background:#eee;color:#aaa}.hint,.empty{color:#999;text-align:center;padding:40rpx 24rpx}.empty{padding-top:180rpx;display:flex;flex-direction:column;align-items:center}.empty-box{width:160rpx;height:160rpx;line-height:160rpx;border-radius:50%;background:#f7f7f7;color:#bcc7ae;font-size:110rpx;margin-bottom:26rpx}.error{padding:24rpx;margin:20rpx;background:#fff1ee;color:#b84d41;line-height:1.6}.error button{margin:12rpx 0 0}.more{margin:30rpx;color:#299ba2;background:#e9f9f9;font-size:27rpx}
+
+/* Compact horizontal time choices; override shared full-width buttons. */
+.slots{display:flex;flex-direction:row;flex-wrap:wrap;gap:14rpx}.slots button{width:calc((100% - 28rpx) / 3);min-width:0;flex:none;margin:0;padding:12rpx 4rpx;border-radius:12rpx;box-sizing:border-box;font-size:23rpx;line-height:1.6}.period{margin-bottom:20rpx;padding:22rpx;background:#f7fbfb;border:1rpx solid #e5f1f1;border-radius:18rpx}.period-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12rpx}.remaining{font-size:22rpx;flex-shrink:0}.address{margin-top:8rpx}.date-strip{position:sticky;top:0;z-index:2}.date-label{width:110rpx}.error{display:flex;flex-direction:column;align-items:flex-start}.error button{width:auto}
+
+
+/* Shared clinic palette and touch targets. */
+page { background: #f3f7f5; color: #183833; }
+.search { margin: 20rpx 24rpx; background: #fff; border: 1rpx solid #dce8e4; border-radius: 22rpx; }
+.search button { min-height: 72rpx; background: #e3f3ec; color: #08786c; }
+.date-strip { background: #f3f7f5; border-bottom: 1rpx solid #dce8e4; }
+.date { margin-right: 8rpx; border-radius: 14rpx; color: #526e68; }
+.date.selected { background: #dcefe7; border-bottom: 4rpx solid #08786c; color: #075d52; }
+.date-label { color: #3d6158; }
+.list-row {
+  margin: 14rpx 24rpx;
+  padding: 24rpx;
+  border: 1rpx solid #dce8e4;
+  border-radius: 24rpx;
+  background: #fff;
+}
+.clinic-logo, .fallback { background: #e3f3ec; color: #246e60; border-color: #cce8dd; }
+.preview, .professional, .address { color: #526e68; }
+.go { background: #08786c; padding: 6rpx 20rpx; border-radius: 12rpx; }
+.status { background: #08786c; }
+.full { background: #697e77; }
+.detail-head { background: #e5f3ec; padding: 24rpx; }
+.profile { border: 1rpx solid #dce8e4; border-radius: 24rpx; box-shadow: none; }
+.section { border-bottom: 1rpx solid #dce8e4; }
+.section-title { border-color: #36a18b; color: #183833; }
+.location, .expand, .remaining { color: #08786c; }
+.period { background: #fff; border-color: #dce8e4; border-radius: 24rpx; }
+.slots button { min-height: 74rpx; background: #e3f3ec; color: #075d52; font-weight: 700; }
+.slots button[disabled] { background: #edf1ef; color: #63766e; }
+.hint, .empty { color: #526e68; }
+
+/* ===== 科技蓝主题覆盖（2026-11-11） ===== */
+page { background: #f4f8fe; color: #0b1b33; }
+.catalog-page { padding-bottom: 60rpx; }
+.search { margin: 20rpx 24rpx; background: #fff; border: 2rpx solid #e8eef8; border-radius: 22rpx; box-shadow: 0 8rpx 24rpx rgba(20,50,110,.06); }
+.search button { background: #eef4ff; color: #2f6bff; }
+.date-strip { background: #f4f8fe; border-bottom: 0; padding: 10rpx 0; }
+.date-label { color: #8c99ac; }
+.date { color: #5c6d86; border-radius: 16rpx; }
+.date.selected { background: linear-gradient(160deg, #2f6bff, #18b6ff); color: #fff; border-bottom: 0; box-shadow: 0 10rpx 22rpx rgba(47,107,255,.26); }
+.list-row { border-bottom: 2rpx solid #eef2fa; background: #fff; }
+.clinic-logo { border-color: #dbe7ff; color: #2f6bff; background: #eef4ff; }
+.clinic-name, .name { color: #0b1b33; font-weight: 700; }
+.title, .preview, .address { color: #8c99ac; }
+.status { background: #2f6bff; }
+.status.full { background: #b3bfcd; }
+.go { background: #2f6bff; border-radius: 12rpx; }
+.section-title { border-left: 8rpx solid #2f6bff; color: #0b1b33; font-weight: 800; }
+.period { background: #fff; border: 2rpx solid #eef2fa; border-radius: 24rpx; box-shadow: 0 8rpx 24rpx rgba(20,50,110,.05); }
+.period-heading { color: #31425c; }
+.remaining { color: #2f6bff; font-weight: 700; }
+.slots button { background: #e9f1ff; color: #1653c8; border: 2rpx solid #dbe7ff; border-radius: 14rpx; min-height: 64rpx; font-weight: 700; }
+.slots button[disabled] { background: #f2f6fc; color: #b3bfcd; border-color: #e8eef8; }
+.detail-head { background: linear-gradient(118deg, #1b3c8f, #2f6bff 58%, #18b6ff); }
+.profile { border-radius: 28rpx; box-shadow: 0 16rpx 36rpx rgba(20,50,110,.10); }
+.professional, .intro { color: #5c6d86; }
+.expand { color: #2f6bff; }
+.hint, .empty { color: #aab6c6; }
+.error { background: #fdeeea; color: #b7452f; border-radius: 20rpx; }
+.more { background: #eef4ff; color: #2f6bff; }
+
+/* 列表内名称与地址分层显示 */
+.list-row { align-items: flex-start; }
+.row-copy { display: flex; flex-direction: column; gap: 6rpx; }
+.clinic-name, .name { display: block; color: #0b1b33; font-weight: 700; }
+.preview, .address { display: block; color: #8c99ac; font-size: 23rpx; line-height: 1.6; -webkit-line-clamp: 2; }
+.list-row .go { align-self: center; }
+
+.clinic-address { display: block; margin-top: 6rpx; font-size: 23rpx; color: #8c99ac; line-height: 1.6; }

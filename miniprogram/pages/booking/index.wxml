@@ -1,0 +1,130 @@
+<view class="page">
+  <view class="banner">
+    <text class="eyebrow">和安口腔 · 门诊预约</text>
+    <text class="title">{{mode === 'new' ? '预约挂号' : mode === 'reschedule' ? '申请改约' : '告知取消'}}</text>
+    <text class="note">{{selectionLocked && selectedSlotKey ? '就诊安排已选好，请核对并填写就诊需求。' : '选门店与医生 → 选日期时段 → 确认预约'}}</text>
+  </view>
+
+  <view wx:if="{{pendingOperation}}" class="pending-card">
+    <text class="pending-title">有一笔操作结果待核实</text>
+    <text class="note">{{pendingOperation.kind}}的原请求和操作号已保存。重试会发送完全相同的请求，不会生成新操作号。</text>
+    <button wx:if="{{pendingOperation.matchesPatient}}" class="primary" loading="{{busy}}" disabled="{{busy}}" bindtap="retryPendingOperation">重试原请求</button>
+    <text wx:else class="note">请用创建原操作的本人账号恢复；当前账号不匹配时不会发送。</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="card state">正在读取本人预约状态、门店和出诊资料…</view>
+  <view wx:if="{{sourceAppointment}}" class="card source-card">
+    <text class="section-title">当前预约</text>
+    <text class="source-line">{{sourceAppointment.appointment_no}} · {{sourceAppointment.appointment_status}}</text>
+    <text class="source-line">{{sourceAppointment.display_start}} 至 {{sourceAppointment.display_end}}（上海时间）</text>
+  </view>
+
+  <view wx:if="{{followupPlan}}" class="card followup-card">
+    <text class="section-title">关联复诊计划</text>
+    <view class="followup-row"><text>建议日期</text><text>{{followupPlan.suggested_date}}</text></view>
+    <view class="followup-row"><text>计划状态</text><text>{{followupPlan.status}}</text></view>
+    <text class="followup-recommendation">{{followupPlan.recommendation}}</text>
+    <text class="note">这是复诊建议，不会自动作为本次就诊项目。请按本次实际需求填写就诊需求；门店和牙医按真实出诊选择，可以与原计划来源不同。</text>
+  </view>
+  <view wx:if="{{linkedEntryRequired && followupPlan && followupPlan.status !== '待复诊'}}" class="notice">
+    此复诊计划当前状态为“{{followupPlan.status}}”，不能新增关联预约。请返回计划列表查看服务端状态。
+  </view>
+  <view wx:if="{{linkedEntryRequired && !followupPlan && !loading}}" class="notice">
+    复诊计划未能通过当前本人会话核验。请返回复诊计划列表并在本人账号下重新打开。
+  </view>
+  <view wx:if="{{linkedResultNeedsReview}}" class="notice">
+    服务端已返回预约结果，但关联到当前复诊计划尚未核实。该计划的自助关联预约已暂停；请联系门店前台核对计划和预约记录，不要重复提交。
+  </view>
+
+  <view wx:if="{{bookingStatus.restricted}}" class="restriction">
+    服务端限制时段：{{bookingStatus.restriction.display_starts_at}} 至 {{bookingStatus.restriction.display_ends_at}}（上海时间）。{{bookingStatus.restriction.reason}}。仍可查询、取消或电话联系前台。
+    <view wx:for="{{clinics}}" wx:key="clinic_id" class="phone-row">
+      <text>{{item.name}}</text>
+      <button wx:if="{{item.phone}}" class="phone-button" data-phone="{{item.phone}}" catchtap="callClinic">拨打 {{item.phone}}</button>
+    </view>
+  </view>
+
+  <view wx:if="{{mode !== 'new' && sourceAppointment && !canCancelSource && !pendingOperation}}" class="notice">
+    此预约的当前状态不符合自助取消或改约条件。实际到诊、诊疗、结算或状态冲突由服务端最终核验，请联系门店前台。
+    <view wx:for="{{clinics}}" wx:key="clinic_id" class="phone-row">
+      <text>{{item.name}}</text>
+      <button wx:if="{{item.phone}}" class="phone-button" data-phone="{{item.phone}}" catchtap="callClinic">拨打 {{item.phone}}</button>
+    </view>
+  </view>
+
+  <view wx:if="{{mode === 'cancel' && sourceAppointment && canCancelSource && !pendingOperation}}" class="card">
+    <text class="section-title">取消说明</text>
+    <text class="note">距预约开始至少3小时的取消属于正常调整；少于3小时会记录临近取消事件，但仍可取消并释放时段。若已实际到诊或处理，需由前台核实。</text>
+    <textarea class="field multiline" maxlength="8000" value="{{reason}}" placeholder="请填写取消原因" bindinput="onReasonInput" />
+    <button class="danger" loading="{{busy}}" disabled="{{busy}}" bindtap="startSubmit">确认告知取消</button>
+  </view>
+
+  <view wx:if="{{mode !== 'cancel' && bookingStatus.restricted}}" class="restriction">当前限制期不能自助新增或改约。请联系门店前台；仍可查询和告知取消。</view>
+
+  <block wx:if="{{!entryInvalid && mode !== 'cancel' && !loading && !pendingOperation && !bookingStatus.restricted && (!sourceAppointment || canRescheduleSource) && (!linkedEntryRequired || canCreateLinked) && !linkedResultNeedsReview}}">
+    <view wx:if="{{sourceAppointment}}" class="notice">
+      改约候选会保守避开本人所有未结束安排，包括当前预约。时段接口不含预约ID，无法安全识别并排除原约；服务端最终校验并在成功时替换原约。失败会保留原安排。
+    </view>
+
+    <view wx:if="{{selectionLocked && selectedSlotKey}}" class="card selected-booking"><text class="section-title">已选就诊安排</text><text class="summary-line">{{selectedClinicName}}</text><text class="summary-line">{{selectedSlotDentist}}</text><text class="summary-line">{{selectedSlotLabel}}</text><button class="change-selection" size="mini" bindtap="changeSelection">更改就诊安排</button></view>
+    <view wx:if="{{!selectionLocked || !selectedSlotKey}}" class="card">
+      <text class="section-title">1. 选择就诊门店与医生</text>
+      <picker mode="selector" range="{{clinics}}" range-key="name" value="{{clinicIndex < 0 ? 0 : clinicIndex}}" bindchange="onClinicChange">
+        <view class="picker"><text>门店 / 院区</text><text>{{selectedClinicName || '请选择门店'}} ›</text></view>
+      </picker>
+      <view class="department-note"><text>科室信息</text><text>以门店实际接诊安排为准</text></view>
+      <text class="note">目前门店未提供独立科室目录，可按出诊医生预约。</text>
+      <picker wx:if="{{selectedClinicId}}" mode="selector" range="{{dentistOptions}}" range-key="name" value="{{selectedDentistId ? dentistIndex + 1 : 0}}" bindchange="onDentistChange">
+        <view class="picker"><text>医生</text><text>{{selectedDentistName || '不限医生'}} ›</text></view>
+      </picker>
+      <picker mode="selector" range="{{durationOptions}}" range-key="label" value="{{selectedDurationIndex < 0 ? 0 : selectedDurationIndex}}" bindchange="onDurationChange">
+        <view class="picker"><text>预约时长</text><text>{{selectedDuration || '请选择时长'}}{{selectedDuration ? ' 分钟' : ''}}</text></view>
+      </picker>
+      <text wx:if="{{sourceAppointment}}" class="note">改约默认保留原时长；可选择其他时长。</text>
+      <text wx:else class="note">时长是你的预约请求，不代表所有治疗均为相同时长；门店将按实际安排核实。</text>
+    </view>
+
+    <view wx:if="{{!selectionLocked || !selectedSlotKey}}" class="card section">
+      <text class="section-title">2. 选择日期与时段</text>
+      <picker wx:if="{{dateOptions.length}}" mode="selector" range="{{dateOptions}}" range-key="label" value="{{dateIndex}}" bindchange="onDateChange">
+        <view class="picker"><text>就诊日期</text><text>{{selectedDate}} ›</text></view>
+      </picker>
+      <text class="note">仅显示当前可选日期，时间为上海时间。不限医生时，请在时段卡片中确认实际出诊医生。</text>
+      <view wx:if="{{selectedClinicId && selectedDuration && candidates.length === 0}}" class="state">暂无可约时段，请更换门店、医生或时长，也可稍后刷新。</view>
+      <view wx:elif="{{!selectedClinicId || !selectedDuration}}" class="state">请先选择门店和预约时长。</view>
+      <view wx:for="{{candidates}}" wx:key="key" class="candidate {{selectedSlotKey === item.key ? 'candidate-selected' : ''}}" data-index="{{index}}" bindtap="selectSlot">
+        <text class="candidate-time">{{item.timeLabel}}</text>
+        <text class="candidate-duration">{{item.dentistName}} · {{item.durationLabel}} {{selectedSlotKey === item.key ? '已选择' : '可预约'}}</text>
+      </view>
+    </view>
+
+    <view class="card section">
+      <text class="section-title">3. 填写就诊需求</text>
+      <text wx:if="{{followupPlan}}" class="note">复诊建议仅供参考，不会自动填入本次就诊需求。</text>
+      <textarea class="field multiline" maxlength="8000" value="{{requestedTreatments}}" placeholder="请描述希望就诊的原因或项目名称" bindinput="onRequestedTreatmentsInput" />
+      <textarea class="field multiline" maxlength="8000" value="{{specialNeeds}}" placeholder="其他安排说明（选填）" bindinput="onSpecialNeedsInput" />
+      <textarea wx:if="{{sourceAppointment}}" class="field multiline" maxlength="8000" value="{{reason}}" placeholder="请说明改约原因" bindinput="onReasonInput" />
+    </view>
+
+    <view class="card section">
+      <view wx:if="{{selectedSlotKey}}" class="booking-summary">
+        <text class="section-title">确认就诊安排</text>
+        <text class="summary-line">{{selectedClinicName}} · {{selectedSlotDentist}}</text>
+        <text class="summary-line">{{selectedSlotLabel}}</text>
+        <text class="note">请核对门店、医生和时间。提交成功后在预约详情查看结果，按约定时间到店；如需改约或取消，请进入我的预约。</text>
+      </view>
+      <text class="section-title">项目目录与参考价</text>
+      <text class="note">仅为服务端当前启用目录的标准参考价，不代表本次收费；实际项目、数量及价格由负责牙医确认。</text>
+      <view wx:if="{{treatments.length === 0}}" class="state">暂无启用项目目录。</view>
+      <view wx:for="{{treatments}}" wx:key="treatment_type_id" class="catalog-row">
+        <text class="catalog-name">{{item.name}}</text>
+        <text class="catalog-price">参考 ¥{{item.standard_unit_price}} / {{item.unit_name}}</text>
+      </view>
+    </view>
+
+    <button class="primary submit" loading="{{busy}}" disabled="{{busy || confirming || bookingStatus.restricted || !selectedSlotKey || !requestedTreatments}}" bindtap="startSubmit">{{mode === 'reschedule' ? '确认改约' : followupPlan ? '确认复诊预约' : '确认预约挂号'}}</button>
+  </block>
+
+  <view wx:if="{{error}}" class="error"><text>{{error}}</text><button class="retry-button" loading="{{loading}}" disabled="{{loading || busy}}" bindtap="retryWorkflow">重新读取办理资料</button></view>
+  <text class="footnote">提交后请查看预约结果。网络结果不明时先重试原请求，避免重复预约。</text>
+</view>

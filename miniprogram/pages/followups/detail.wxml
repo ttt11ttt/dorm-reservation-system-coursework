@@ -1,0 +1,25 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="card state">正在读取本人复诊计划…</view>
+  <view wx:elif="{{error}}" class="error"><text>{{error}}</text><button class="retry-button" loading="{{loading}}" disabled="{{loading}}" bindtap="loadDetail">重新读取计划</button></view>
+  <block wx:elif="{{plan}}">
+    <view class="card">
+      <view class="heading">
+        <text class="title">复诊计划</text>
+        <text class="status">{{plan.status}}</text>
+      </view>
+      <view class="row"><text class="label">建议日期</text><text class="value">{{plan.suggested_date}}</text></view>
+      <view class="row"><text class="label">计划状态</text><text class="value">{{plan.status}}</text></view>
+      <view class="row"><text class="label">服务端逾期标记</text><text class="value {{plan.overdue ? 'overdue-yes' : ''}}">{{plan.overdue ? '是' : '否'}}</text></view>
+      <view class="row"><text class="label">计划编号</text><text class="value">{{plan.followup_plan_id}}</text></view>
+      <view class="recommendation-block">
+        <text class="label">复诊建议</text>
+        <text class="recommendation">{{plan.recommendation}}</text>
+      </view>
+    <button wx:if="{{plan.status === '待复诊'}}" class="primary" bindtap="arrangeFollowup">安排本次复诊</button>
+    </view>
+    <view class="card note-card">
+      <text class="note">此页只展示计划摘要，不含患者联系历史或提醒发送结果。已有预约可在“我的预约”独立查看；预约或联系记录本身不代表计划已完成，状态以服务端为准。</text>
+    </view>
+  </block>
+  <button class="back-button" bindtap="goBack">返回复诊计划列表</button>
+</view>

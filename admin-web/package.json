@@ -1,0 +1,22 @@
+{
+  "name": "adc-clinic-admin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5178 --strictPort",
+    "start:local": "node scripts/start-dev.cjs",
+    "stop:local": "node scripts/stop-dev.cjs",
+    "typecheck": "vue-tsc --noEmit",
+    "build": "npm run typecheck && vite build"
+  },
+  "dependencies": {
+    "vue": "^3.5.22"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.4",
+    "typescript": "~5.9.3",
+    "vite": "^6.4.1",
+    "vue-tsc": "^3.1.1"
+  }
+}

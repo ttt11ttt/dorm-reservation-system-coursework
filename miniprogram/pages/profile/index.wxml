@@ -1,0 +1,31 @@
+<view class="profile">
+  <view wx:if="{{error}}" class="error">{{error}} <button size="mini" disabled="{{busy}}" bindtap="load">重新读取</button></view>
+  <view wx:if="{{notice}}" class="notice">{{notice}}</view>
+  <view wx:if="{{patient}}" class="card">
+    <view class="title">联系资料 · {{patient.name}}</view>
+    <label>联系电话<input value="{{patient.phone}}" maxlength="32" data-field="phone" disabled="{{busy}}" bindinput="contactInput"/></label>
+    <label>邮箱（可选）<input value="{{patient.email}}" maxlength="254" data-field="email" disabled="{{busy}}" bindinput="contactInput"/></label>
+    <label>账单地址<input value="{{patient.billing_address}}" maxlength="255" data-field="billing_address" disabled="{{busy}}" bindinput="contactInput"/></label>
+    <label>紧急联系人<input value="{{patient.emergency_name}}" maxlength="80" data-field="emergency_name" disabled="{{busy}}" bindinput="contactInput"/></label>
+    <label>紧急联系电话<input value="{{patient.emergency_phone}}" maxlength="32" data-field="emergency_phone" disabled="{{busy}}" bindinput="contactInput"/></label>
+    <button type="primary" disabled="{{busy}}" bindtap="saveContact">保存联系方式</button>
+  </view>
+  <view wx:if="{{patient}}" class="card">
+    <view class="title">过敏申报</view>
+    <radio-group bindchange="declare">
+      <label><radio value="无已知过敏" checked="{{declaration==='无已知过敏'}}" disabled="{{busy}}"/>无已知过敏</label>
+      <label><radio value="已报告过敏" checked="{{declaration==='已报告过敏'}}" disabled="{{busy}}"/>有过敏情况</label>
+    </radio-group>
+    <view wx:if="{{declaration==='已报告过敏'}}">
+      <view wx:for="{{items}}" wx:key="index" class="allergy">
+        <input value="{{item.substance}}" placeholder="过敏物质" maxlength="100" data-index="{{index}}" data-field="substance" disabled="{{busy}}" bindinput="allergyInput"/>
+        <input value="{{item.reaction_note}}" placeholder="反应说明（可选）" maxlength="255" data-index="{{index}}" data-field="reaction_note" disabled="{{busy}}" bindinput="allergyInput"/>
+        <view wx:if="{{item.verification_status}}">{{item.verification_status}}</view>
+        <button size="mini" data-index="{{index}}" disabled="{{busy}}" bindtap="removeItem">移除</button>
+      </view>
+      <button size="mini" disabled="{{busy}}" bindtap="addItem">添加过敏项</button>
+    </view>
+    <view class="note">申报后由牙医在接诊时核对。</view>
+    <button type="primary" disabled="{{busy}}" bindtap="saveAllergies">保存过敏申报</button>
+  </view>
+</view>

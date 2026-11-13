@@ -1,0 +1,188 @@
+<view class="page">
+  <view class="greet">
+    <view class="greet-copy">
+      <text class="hi">{{greeting}}，{{profile ? profile.patient.name : '访客'}}</text>
+      <view class="g-sub"><view class="g-dot"></view><text>{{profile ? '患者编号 ' + profile.patient.patient_no + ' · 已核验' : (subjectKind === 'GUEST' ? '访客预约 · 到店核验后绑定' : '未登录 · 可先浏览可约牙医')}}</text></view>
+    </view>
+    <view class="g-right">
+      <view class="g-ic" bindtap="openReminders"><view class="bell"></view><view class="g-badge" wx:if="{{profile}}"></view></view>
+      <view class="g-ava" bindtap="viewMine">{{profile ? profile.patient.name.slice(0,1) : '访'}}</view>
+    </view>
+  </view>
+
+  <view class="hero">
+    <view class="hero-copy">
+      <block wx:if="{{nextVisit && !appointmentsLoading && !error}}">
+        <text class="hero-kick">下次就诊</text>
+        <text class="hero-title">{{nextVisit.month}} 月 {{nextVisit.day}} 日 {{nextVisit.time}}</text>
+        <text class="hero-sub">{{nextVisit.doctor}} · {{nextVisit.clinic}}</text>
+        <view class="hero-acts">
+          <view class="hero-btn" bindtap="openNextVisit">查看详情</view>
+          <view class="hero-btn ghost" bindtap="openNextVisit">改约</view>
+        </view>
+        <text class="hero-link" bindtap="openCatalogClinics">再约一次 ›</text>
+      </block>
+      <block wx:else>
+        <text class="hero-kick">HEAN DENTAL · 预约挂号</text>
+        <text class="hero-title">预约看牙</text>
+        <text class="hero-sub">按门店、牙医和日期挑选合适的就诊时段</text>
+        <view class="hero-acts">
+          <view class="hero-btn" bindtap="openCatalogClinics">立即预约</view>
+          <view class="hero-btn ghost" bindtap="openCatalogExperts">看医生</view>
+        </view>
+      </block>
+    </view>
+    <view class="hero-art" aria-hidden="true">
+      <view class="hero-ring"></view>
+      <view class="hero-cal">
+        <view class="hero-cal-bar"></view>
+        <view class="hero-cal-grid">
+          <view></view><view></view><view></view>
+          <view></view><view class="hero-cal-on"></view><view></view>
+          <view></view><view></view><view></view>
+        </view>
+      </view>
+      <view class="hero-check"></view>
+    </view>
+  </view>
+
+  <view class="clinic-bar" bindtap="openCatalogClinics">
+    <view class="cb-ic"><view class="pin"></view></view>
+    <view class="cb-txt">
+      <text class="cb-name">{{clinics.length ? clinics[0].name : '选择可预约门店'}}</text>
+      <text class="cb-sub">{{clinics.length ? '查看全部门店与牙医排班' : '按门店、牙医和时段预约'}}</text>
+    </view>
+    <text class="cb-switch">切换 ›</text>
+  </view>
+
+  <view class="announcement"><view class="announcement-speaker"><view></view></view><text class="announcement-label">服务提示</text><text class="announcement-copy">可预约门店与时段以实际出诊安排为准</text></view>
+
+  <view wx:if="{{pendingOperation}}" class="pending-card">
+    <text class="pending-title">有预约操作结果待核实</text>
+    <text class="note">原预约号、请求内容和预约主体已保留。先按原号查询；只有原记录不存在时才会重试原请求。</text>
+    <button wx:if="{{pendingOperation.guest && pendingOperation.matchesSubject}}" class="primary" loading="{{busy}}" disabled="{{busy}}" bindtap="retryPendingOperation">恢复原预约</button>
+    <button wx:elif="{{!pendingOperation.guest && profile && pendingOperation.matchesPatient}}" class="primary" loading="{{busy}}" disabled="{{busy}}" bindtap="retryPendingOperation">重试原请求</button>
+    <text wx:else class="muted">当前微信预约主体与原操作不匹配，不会显示原请求内容或重发。</text>
+  </view>
+
+  <view wx:if="{{!profile && needsIdentity && subjectKind !== 'GUEST'}}" class="card identity-card">
+    <text class="section-title">登录后继续办理</text>
+    <text class="note">使用当前微信账号验证预约会话。</text>
+    <button class="primary" loading="{{busy}}" disabled="{{busy}}" bindtap="login">微信登录并继续</button>
+    <button class="secondary" disabled="{{busy}}" bindtap="closeIdentity">暂不办理</button>
+  </view>
+
+  <view class="doctor-section">
+    <view class="sec"><text class="sec-title">可预约牙医</text><text class="sec-more" bindtap="openCatalogExperts">全部专家 ›</text></view>
+    <scroll-view wx:if="{{recommendedDentists.length}}" class="doc-scroll" scroll-x="true" enhanced="true" show-scrollbar="false">
+      <view wx:for="{{recommendedDentists}}" wx:key="dentist_id" class="doc-card" data-id="{{item.dentist_id}}" bindtap="openCatalogExperts">
+        <view class="doc-top"><view class="doc-ava">{{item.initial}}</view><view class="doc-meta"><text class="doc-name">{{item.name}}</text><text class="doc-role">执业牙医</text></view></view>
+        <text class="doc-clinic">{{item.clinicName}}</text>
+        <text class="doc-go">去预约 ›</text>
+      </view>
+    </scroll-view>
+    <view wx:else class="doctor-empty-row"><text>进入预约流程查看当前可约牙医</text><text class="empty-link" bindtap="openCatalogExperts">去看看 ›</text></view>
+  </view>
+
+  <view wx:if="{{projects.length}}" class="proj-block">
+    <view class="sec"><text class="sec-title">热门项目</text><text class="sec-more" bindtap="openCatalogClinics">全部项目 ›</text></view>
+    <view class="proj-grid">
+      <view wx:for="{{projects}}" wx:key="id" class="pj">
+        <text class="pj-name">{{item.name}}</text>
+        <view class="pj-price-row"><text class="pj-price">¥{{item.price}}</text><text class="pj-unit">/{{item.unit}}</text></view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{profile}}" class="card profile-section" id="my-section">
+    <text class="section-title">本人资料</text>
+    <view class="row"><text class="label">患者编号</text><text class="value">{{profile.patient.patient_no}}</text></view>
+    <view class="row"><text class="label">姓名</text><text class="value">{{profile.patient.name}}</text></view>
+    <view class="row"><text class="label">预约状态</text><text class="value">{{profile.bookingStatus.restricted ? '暂不能自助新增或改约' : '可自助办理'}}</text></view>
+    <view wx:if="{{profile.bookingStatus.restriction}}" class="restriction">
+      服务端限制时段：{{profile.bookingStatus.restriction.display_starts_at}} 至 {{profile.bookingStatus.restriction.display_ends_at}}（上海时间）。
+      {{profile.bookingStatus.restriction.reason}}。可继续查询、告知取消，或联系门店前台。
+    </view>
+    <view wx:if="{{profile.bookingStatus.restricted}}" class="clinic-phones">
+      <text class="phone-title">门店前台电话</text>
+      <view wx:for="{{clinics}}" wx:key="clinic_id" class="phone-row">
+        <text class="phone-name">{{item.name}}</text>
+        <button wx:if="{{item.phone}}" class="phone-button" data-phone="{{item.phone}}" catchtap="callClinic">拨打 {{item.phone}}</button>
+        <text wx:else class="muted">暂无电话</text>
+      </view>
+    </view>
+    <button class="secondary" bindtap="openProfile">编辑联系方式与过敏申报</button>
+    <button class="secondary" bindtap="openReminders">预约与复诊提醒</button>
+    <button class="secondary" loading="{{busy}}" disabled="{{busy}}" bindtap="logout">退出登录</button>
+  </view>
+
+  <view wx:if="{{profile}}" class="card appointments-card" id="appointments-section">
+    <view class="list-heading">
+      <text class="section-title">本人预约</text>
+      <text class="muted">最多显示最近 100 条</text>
+    </view>
+    <view wx:if="{{appointmentsLoading && appointments.length === 0}}" class="state">正在读取预约…</view>
+    <view wx:elif="{{!appointmentsLoading && appointments.length === 0}}" class="state">目前没有预约记录</view>
+    <view wx:for="{{appointments}}" wx:key="appointment_id" class="appointment-row" data-id="{{item.appointment_id}}" bindtap="openAppointment">
+      <view class="appointment-main">
+        <text class="appointment-number">预约 {{item.appointment_no}}</text>
+        <text wx:if="{{item.display_clinic || item.display_dentist}}" class="appointment-status">{{item.display_clinic}} · {{item.display_dentist}}</text>
+        <text class="appointment-time">{{item.display_start}} – {{item.display_end}}</text>
+        <text class="appointment-status">{{item.appointment_status}} · {{item.treatment_status}}</text>
+      </view>
+      <text class="chevron">›</text>
+    </view>
+  </view>
+
+  <view wx:if="{{subjectKind === 'GUEST' || verifyWithoutSession}}" class="card profile-section guest-profile" id="my-section">
+    <text class="section-title">预约联系资料</text>
+    <view class="row"><text class="label">联系人</text><text class="value">{{guestContactName || '提交预约时填写'}}</text></view>
+    <view class="row"><text class="label">联系电话</text><text class="value">{{guestContactPhone || '提交预约时填写'}}</text></view>
+    <view wx:if="{{guestBookingStatus.restricted}}" class="restriction">
+      当前预约主体暂不能新增预约。服务端限制至 {{guestBookingStatus.displayRestrictedUntil || '时间待核实'}}；仍可查询和查看本人预约。
+    </view>
+    <text class="note">如需查看本人诊疗记录和费用，可到店由前台核验后绑定微信。</text>
+    <button class="secondary" loading="{{bindingBusy}}" disabled="{{bindingBusy || busy}}" bindtap="requestBinding">生成到店核验码</button>
+    <view wx:if="{{bindingTicket}}" class="note">
+      <text selectable="true">核验码 {{bindingTicket.code}} · 有效至 {{bindingTicket.expires}}</text>
+    </view>
+    <button class="secondary" disabled="{{bindingBusy || busy}}" bindtap="refreshVerifiedLogin">核验完成后刷新身份</button>
+  </view>
+
+  <view wx:if="{{subjectKind === 'GUEST'}}" class="card appointments-card guest-reservations-card" id="guest-reservations-section">
+    <view class="list-heading">
+      <text class="section-title">本人预约</text>
+      <text class="muted">最多显示最近 100 条</text>
+    </view>
+    <view wx:if="{{appointmentsLoading && guestReservations.length === 0}}" class="state">正在读取本人预约…</view>
+    <view wx:elif="{{!appointmentsLoading && guestReservations.length === 0}}" class="state">目前没有预约记录</view>
+    <view wx:for="{{guestReservations}}" wx:key="reservation_no" class="appointment-row" data-number="{{item.reservation_no}}" bindtap="openGuestReservation">
+      <view class="appointment-main">
+        <text class="appointment-number">预约 {{item.reservation_no}}</text>
+        <text class="appointment-status">{{item.display_clinic}} · {{item.display_dentist}}</text>
+        <text class="appointment-time">{{item.display_start}} – {{item.display_end}}</text>
+        <text class="appointment-status">{{item.reservation_status === '待到诊' ? '访客预约 · 医疗身份待到店核验' : item.reservation_status}}</text>
+      </view>
+      <text class="chevron">›</text>
+    </view>
+  </view>
+
+  <view class="sec"><text class="sec-title">就诊须知</text></view>
+  <view class="tips">
+    <view class="tip-row"><text class="tip-dot"></text><text>请提前 10 分钟到店，携带有效身份证件</text></view>
+    <view class="tip-row"><text class="tip-dot"></text><text>就诊前 3 小时内可自助改约或取消</text></view>
+    <view class="tip-row"><text class="tip-dot"></text><text>过敏申报已核验，本次就诊将复核</text></view>
+  </view>
+
+  <view wx:if="{{error}}" class="error"><text>{{error}}</text><button class="retry-button" loading="{{busy || appointmentsLoading}}" disabled="{{busy || appointmentsLoading}}" bindtap="retryHome">{{profile ? '重新读取资料' : '重试登录'}}</button></view>
+  <text class="footnote">访客预约只保存本次预约及联系人信息，不会创建患者病历账号。预约以详情中的服务端状态为准。</text>
+
+  <view class="bottom-nav">
+    <view class="nav-item {{activeTab === 'home' ? 'nav-active' : ''}}" bindtap="goHome">
+      <view class="nav-icon nav-home"><view class="nav-home-roof"></view><view class="nav-home-base"></view></view><text>首页</text>
+    </view>
+    <view class="nav-item {{activeTab === 'mine' ? 'nav-active' : ''}}" bindtap="viewMine">
+      <view class="nav-icon nav-person"><view class="nav-person-head"></view><view class="nav-person-body"></view></view><text>我的</text>
+    </view>
+  </view>
+</view>

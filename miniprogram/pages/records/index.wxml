@@ -1,0 +1,7 @@
+<view class="records-page">
+  <view wx:if="{{loading}}" class="hint">正在读取预约记录…</view>
+  <view wx:if="{{error}}" class="error"><text>{{error}}</text><button size="mini" bindtap="load">重新登录并读取</button></view>
+  <view wx:if="{{!loading && !error && !rows.length}}" class="empty"><view class="empty-box">◇</view><text>暂无内容</text></view>
+  <view wx:for="{{rows}}" wx:key="reference" class="record" data-index="{{index}}" bindtap="open"><view class="record-heading"><text>{{item.clinic}}</text><text class="status">{{item.status}}</text></view><text>{{item.dentist}}</text><text class="time">{{item.start}} — {{item.end}}</text><view class="details">查看预约详情 ›</view></view>
+  <view wx:if="{{truncated}}" class="hint">当前仅展示最近100条预约</view>
+</view>

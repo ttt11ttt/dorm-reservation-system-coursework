@@ -1,0 +1,37 @@
+<view class="catalog-page">
+  <view wx:if="{{mode === 'clinics' || mode === 'doctors'}}" class="search">
+    <input placeholder="门诊部/医生名称" value="{{q}}" maxlength="40" bindinput="onSearchInput" bindconfirm="search" confirm-type="search" />
+    <button bindtap="search">⌕</button>
+  </view>
+  <scroll-view wx:if="{{mode === 'doctors'}}" scroll-x class="date-strip">
+    <view class="date-label">选择日期</view><view wx:for="{{dates}}" wx:key="date" class="date {{date === item.date ? 'selected' : ''}}" data-date="{{item.date}}" bindtap="selectDate"><text>{{item.week}}</text><text>{{item.short}}</text></view>
+  </scroll-view>
+  <view wx:if="{{error}}" class="error"><text>{{error}}</text><button size="mini" bindtap="retry">重新加载</button></view>
+  <view wx:if="{{loading}}" class="hint">正在加载…</view>
+  <block wx:if="{{mode !== 'detail'}}">
+    <view wx:for="{{rows}}" wx:key="index" class="list-row" data-index="{{index}}" bindtap="openRow">
+      <view wx:if="{{mode === 'clinics'}}" class="clinic-logo">诊</view>
+      <image wx:elif="{{item.avatarUrl}}" class="avatar" src="{{item.avatarUrl}}" mode="aspectFill"/>
+      <view wx:else class="avatar fallback">{{item.initial}}</view>
+      <view class="row-copy">
+        <block wx:if="{{mode === 'clinics'}}"><view class="clinic-name">{{item.name}}</view><view class="clinic-address">{{item.address}}</view></block>
+        <block wx:else><view><text class="name">{{item.name}}</text><text class="title">{{item.specialtyLabel}}　{{item.professionalTitle}}</text></view><text class="preview">{{item.introductionPreview || '医生介绍待补充'}}</text><text wx:if="{{mode === 'doctors'}}" class="go {{item.status !== 'AVAILABLE' ? 'full' : ''}}">去预约 ›</text></block>
+      </view>
+      <text wx:if="{{mode === 'doctors'}}" class="status {{item.status !== 'AVAILABLE' ? 'full' : ''}}">{{item.statusLabel}}</text>
+    </view>
+    <view wx:if="{{!loading && !error && !rows.length}}" class="empty"><view class="empty-box">◇</view><text>{{mode === 'clinics' ? '暂无门诊' : mode === 'experts' ? '暂无已公开的专家资料' : '当天暂无排班'}}</text></view>
+    <button wx:if="{{hasMore}}" class="more" bindtap="more" disabled="{{loading}}">加载更多</button>
+  </block>
+  <block wx:if="{{mode === 'detail' && detail}}">
+    <view class="detail-head"><view class="profile"><view class="person"><image wx:if="{{detail.avatarUrl}}" class="avatar" src="{{detail.avatarUrl}}" mode="aspectFill"/><view wx:else class="avatar fallback">{{detail.initial}}</view><view><text class="name">{{detail.name}}</text><text class="professional">{{detail.specialtyLabel}}　{{detail.professionalTitle}}</text></view></view><text class="intro {{expandedIntro ? '' : 'clamped'}}">{{detail.introduction || '医生介绍待补充'}}</text><view class="expand" bindtap="toggleIntro">{{expandedIntro ? '收起 ⌃' : '展开 ⌄'}}</view></view></view>
+    <view class="section"><view class="section-title">擅长领域</view><text class="intro {{expandedExpertise ? '' : 'clamped'}}">{{detail.expertise || '擅长资料待补充'}}</text><view class="expand" bindtap="toggleExpertise">{{expandedExpertise ? '收起 ⌃' : '展开 ⌄'}}</view></view>
+    <picker wx:if="{{locations.length > 1}}" range="{{locations}}" range-key="name" value="{{locationIndex}}" bindchange="selectLocation"><view class="location">出诊门诊：{{clinicName}}　⌄</view></picker>
+    <scroll-view wx:if="{{dates.length}}" scroll-x class="date-strip"><view class="date-label">选择日期</view><view wx:for="{{dates}}" wx:key="date" class="date {{date === item.date ? 'selected' : ''}}" data-date="{{item.date}}" bindtap="selectDate"><text>{{item.week}}</text><text>{{item.short}}</text></view></scroll-view>
+    <view class="section"><view class="section-title">排班情况</view>
+      <view wx:if="{{!loading && !error && (!dates.length || status === 'NOT_SCHEDULED')}}" class="hint">暂无排班</view>
+      <view wx:elif="{{!loading && !error && status === 'FULL'}}" class="hint">当天可约时段已约满</view>
+      <view wx:for="{{periods}}" wx:key="index" wx:for-item="period" wx:for-index="pindex" class="period"><view class="period-heading"><text>{{date}}　{{period.label}} {{period.time}}</text><text class="remaining">剩余 {{period.remainingCandidateCount}} 个可约时段</text></view><text class="address">地点：{{clinicName}} {{locations[locationIndex].address}}</text><view class="slots"><button wx:for="{{period.slots}}" wx:key="start" wx:for-item="slot" wx:for-index="sindex" data-period="{{pindex}}" data-slot="{{sindex}}" bindtap="book" disabled="{{!slot.available || booking || loading}}">{{slot.label}}{{slot.available ? '' : ' 已约'}}</button></view></view>
+    </view>
+  </block>
+</view>
+

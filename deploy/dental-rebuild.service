@@ -1,0 +1,36 @@
+[Unit]
+Description=Hean dental rebuild coursework backend
+After=network.target mysql.service
+StartLimitIntervalSec=120
+StartLimitBurst=3
+[Service]
+Type=simple
+User=dental
+Group=dental
+WorkingDirectory=/var/lib/dental-rebuild
+EnvironmentFile=/etc/dental-rebuild/dental.env
+ExecStart=/usr/bin/java -Xms96m -Xmx320m -Xss512k -XX:MaxMetaspaceSize=160m -XX:ReservedCodeCacheSize=48m -XX:MaxDirectMemorySize=24m -XX:+UseSerialGC -XX:ActiveProcessorCount=2 -Duser.timezone=UTC -jar /opt/dental-rebuild/releases/20261026/backend/dental.jar --spring.profiles.active=production --spring.config.additional-location=file:/etc/dental-rebuild/application-production.properties
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+SuccessExitStatus=143
+UMask=0077
+StateDirectory=dental-rebuild
+StateDirectoryMode=0750
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/dental-rebuild
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+MemoryMax=640M
+TasksMax=96
+LimitNOFILE=4096
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,16 @@
+page{background:#fff;color:#333}.records-page{min-height:100vh;font-size:28rpx}.empty{padding-top:420rpx;display:flex;flex-direction:column;align-items:center;color:#999}.empty-box{width:190rpx;height:190rpx;border-radius:50%;background:#f8f8f8;color:#bac9af;font-size:130rpx;line-height:190rpx;text-align:center;margin-bottom:22rpx}.hint{text-align:center;padding:40rpx;color:#999}.error{padding:24rpx;margin:24rpx;color:#b84d41;background:#fff1ed}.error button{margin:14rpx 0 0}.record{padding:30rpx;border-bottom:10rpx solid #f6f6f6;line-height:1.8}.record-heading{display:flex;justify-content:space-between;gap:18rpx;font-weight:500;margin-bottom:15rpx}.status{color:#39b9c2;font-size:25rpx;flex-shrink:0}.time{display:block;color:#888;font-size:25rpx}.details{text-align:right;color:#39b9c2;font-size:25rpx;margin-top:15rpx}
+
+/* ===== 科技蓝主题覆盖（2026-11-11） ===== */
+page { background: #f4f8fe; color: #0b1b33; }
+.records-page { padding: 24rpx 28rpx 60rpx; }
+.record { background: #fff; border-radius: 24rpx; padding: 24rpx; margin-bottom: 16rpx; box-shadow: 0 8rpx 24rpx rgba(20,50,110,.06); }
+.record-heading { font-size: 27rpx; font-weight: 800; color: #0b1b33; }
+.status { color: #2f6bff; font-weight: 700; }
+.time { color: #8c99ac; }
+.empty-box { background: #eef4ff; color: #2f6bff; border-radius: 50%; }
+.hint, .empty { color: #aab6c6; }
+.error { background: #fdeeea; color: #b7452f; border-radius: 20rpx; }
+
+/* 状态徽标：保留底色但用深蓝字，避免白字消失 */
+.status { background: #e9f1ff !important; color: #1653c8 !important; border-radius: 999rpx; padding: 4rpx 16rpx; font-size: 21rpx; font-weight: 700; display: inline-block; }
+.record-heading { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; }

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "我的复诊计划",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 80,
+  "navigationBarBackgroundColor": "#ffffff",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#f4f8fe"
+}

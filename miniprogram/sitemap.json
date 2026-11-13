@@ -1,0 +1,4 @@
+{
+  "desc": "患者小程序开发预览",
+  "rules": [{ "action": "allow", "page": "*" }]
+}

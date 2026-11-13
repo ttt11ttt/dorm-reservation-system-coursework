@@ -1,0 +1,10 @@
+<view class="inbox">
+  <view wx:if="{{busy}}">正在读取提醒…</view>
+  <view wx:elif="{{error}}">{{error}}<button size="mini" bindtap="load">重试</button></view>
+  <view wx:elif="{{!rows.length}}">暂无预约或复诊提醒</view>
+  <view class="message" wx:for="{{rows}}" wx:key="message_id">
+    <view class="message-title">{{item.reminder_kind}}</view>
+    <view>{{item.content}}</view>
+    <view class="message-meta">{{item.clinic_name}} · {{item.display_time}}</view>
+  </view>
+</view>

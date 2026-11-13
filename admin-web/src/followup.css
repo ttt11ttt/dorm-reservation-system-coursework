@@ -1,0 +1,101 @@
+.followup-work-tabs { display: flex; gap: 6px; width: fit-content; max-width: 100%; padding: 4px; border: 1px solid var(--line, #e4e8ee); border-radius: 12px; background: #f7f9fb; }
+.followup-work-tabs button { border: 0; border-radius: 9px; padding: 9px 14px; background: transparent; color: var(--muted, #64748b); font: inherit; cursor: pointer; }
+.followup-work-tabs button.active { background: #fff; color: var(--ink, #1e293b); box-shadow: 0 1px 4px #172b3b12; font-weight: 700; }
+.followup-workspace { min-width: 0; }
+.followup-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 14px; }
+.followup-filters label { display: grid; gap: 6px; color: var(--muted, #64748b); font-size: 13px; }
+.followup-overdue-filter { display: flex !important; align-items: center; min-height: 40px; gap: 8px !important; }
+.followup-overdue-filter input, .followup-review-check input { width: auto; }
+.followup-asof { margin: 14px 0; font-size: 13px; }
+.followup-plan-list { display: grid; gap: 12px; }
+.followup-plan-card, .followup-summary-card, .followup-subpanel, .followup-pending-card, .followup-create-card { min-width: 0; padding: 16px; border: 1px solid var(--line, #e4e8ee); border-radius: 14px; background: #fff; }
+.followup-plan-card { display: grid; gap: 12px; }
+.followup-plan-main { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.followup-plan-title { display: grid; gap: 5px; min-width: 0; }
+.followup-plan-title > strong { font-size: 16px; }
+.followup-plan-title small, .followup-plan-date span, .followup-plan-date small { color: var(--muted, #64748b); }
+.followup-plan-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+.followup-plan-date { min-width: 130px; display: grid; gap: 4px; text-align: right; }
+.followup-plan-date strong { font-size: 17px; }
+.followup-recommendation { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.followup-linked-appointments { display: grid; gap: 5px; padding: 10px 12px; border-radius: 10px; background: #f7f9fb; font-size: 13px; }
+.followup-linked-appointments span, .followup-linked-appointments small { color: var(--muted, #64748b); overflow-wrap: anywhere; }
+.followup-load-more { display: flex; justify-content: center; padding-top: 16px; }
+.followup-dialog-backdrop { z-index: 50; }
+.followup-backdrop { z-index: 50; padding: 16px; align-items: flex-start; overflow: auto; }
+.followup-dialog { width: min(920px, 100%); max-height: calc(100dvh - 32px); display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line, #e4e8ee); border-radius: 18px; background: var(--surface, #fff); box-shadow: 0 24px 80px #1024382b; }
+.followup-dialog-head, .followup-dialog-footer { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 16px 20px; }
+.followup-dialog-head { border-bottom: 1px solid var(--line, #e4e8ee); }
+.followup-dialog-head h2 { margin: 2px 0 4px; overflow-wrap: anywhere; }
+.followup-dialog-head p { margin: 0; }
+.followup-dialog-body { display: grid; gap: 14px; overflow: auto; padding: 18px 20px; }
+.followup-dialog-footer { border-top: 1px solid var(--line, #e4e8ee); background: #fbfcfd; }
+.followup-dialog-footer small { color: var(--muted, #64748b); }
+.followup-summary-head, .followup-summary-head > div { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.followup-summary-card dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 14px 0 0; }
+.followup-summary-card dl > div { min-width: 0; padding: 10px; border-radius: 10px; background: #f6f8fa; }
+.followup-summary-card dt { margin-bottom: 5px; color: var(--muted, #64748b); font-size: 12px; }
+.followup-summary-card dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-weight: 600; }
+.followup-alert { display: grid; gap: 5px; padding: 12px 14px; border-radius: 10px; }
+.followup-alert-warn { color: #75450c; background: #fff6e9; }
+.followup-alert-error { color: #8a2c25; background: #fef1f0; }
+.followup-review-check { display: flex; align-items: center; gap: 9px; }
+.followup-subpanel h3 { margin: 0 0 4px; }
+.followup-appointment-list, .followup-contact-list { display: grid; gap: 8px; }
+.followup-appointment-list article, .followup-contact-list article { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line, #e4e8ee); }
+.followup-appointment-list article { flex-wrap: wrap; }
+.followup-appointment-list span, .followup-contact-list small { color: var(--muted, #64748b); }
+.followup-contact-list article > div { min-width: 0; }
+.followup-contact-list p { margin: 5px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.followup-contact-list code { flex: 0 0 auto; max-width: 35%; overflow-wrap: anywhere; }
+.followup-history { display: grid; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--line, #cbd5e1); }
+.followup-form { margin-top: 12px; }
+.followup-form-actions { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.followup-form-actions small { color: var(--muted, #64748b); overflow-wrap: anywhere; }
+.followup-cancel-form { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line, #e4e8ee); }
+.followup-pending-card { border-color: #e9c98a; background: #fffcf5; }
+.followup-pending-card article { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0e5ce; }
+.followup-pending-card article > div:first-child { display: grid; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.followup-pending-card small { color: var(--muted, #64748b); }
+.followup-pending-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.followup-create-card { display: grid; gap: 10px; }
+.followup-create-card .section-heading { margin-bottom: 0; }
+@media (max-width: 720px) {
+  .followup-work-tabs { width: 100%; }
+  .followup-work-tabs button { flex: 1; }
+  .followup-plan-main { display: grid; }
+  .followup-plan-date { text-align: left; }
+  .followup-summary-card dl { grid-template-columns: 1fr; }
+  .followup-backdrop { padding: 0; }
+  .followup-dialog { width: 100%; min-height: 100dvh; max-height: none; border: 0; border-radius: 0; }
+  .followup-dialog-head, .followup-dialog-footer { padding: 13px 15px; }
+  .followup-dialog-body { padding: 14px 15px; gap: 11px; }
+  .followup-contact-list article { display: grid; }
+  .followup-contact-list code { max-width: 100%; }
+  .followup-filters > * { flex: 1 1 100%; }
+  .followup-form-actions > button { width: 100%; }
+}
+.reminder-workspace { max-width: 1120px; }
+.reminder-rule-panel, .reminder-pending { display: grid; gap: 18px; }
+.reminder-rule-meta, .reminder-capabilities, .reminder-result-meta { display: flex; flex-wrap: wrap; gap: 10px 18px; color: var(--muted, #667085); font-size: 13px; }
+.reminder-capabilities { padding: 13px 15px; border: 1px solid var(--line, #dce3e8); border-radius: 12px; background: var(--surface-soft, #f7f9fa); }
+.reminder-capabilities small { flex-basis: 100%; }
+.reminder-rule-form { padding-top: 4px; }
+.reminder-rule-submit { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.reminder-rule-submit small { overflow-wrap: anywhere; }
+.reminder-object-panel { margin-top: 18px; }
+.reminder-object-panel .section-heading { align-items: flex-start; gap: 12px; }
+.reminder-object-panel .section-heading .action-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.reminder-result { display: grid; gap: 12px; }
+.reminder-action-list { display: grid; gap: 9px; }
+.reminder-action-list article { padding: 12px 14px; border: 1px solid var(--line, #dce3e8); border-radius: 11px; background: var(--surface, #fff); }
+.reminder-action-list article > div { display: grid; gap: 5px; }
+.reminder-action-list small { color: var(--muted, #667085); overflow-wrap: anywhere; }
+.reminder-action-list p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.reminder-pending { border-color: #eccb87; background: #fffaf0; }
+@media (max-width: 680px) {
+  .reminder-object-panel .section-heading { flex-direction: column; }
+  .reminder-object-panel .section-heading .action-buttons { width: 100%; }
+  .reminder-object-panel .section-heading .action-buttons > button { flex: 1 1 140px; }
+  .reminder-rule-submit { align-items: stretch; flex-direction: column; }
+}

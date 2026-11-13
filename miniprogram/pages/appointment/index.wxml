@@ -1,0 +1,71 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="card state">正在读取预约详情…</view>
+  <view wx:elif="{{error}}" class="error"><text>{{error}}</text><button class="retry-button" loading="{{loading}}" disabled="{{loading}}" bindtap="loadDetail">重新读取预约详情</button></view>
+  <block wx:elif="{{appointment}}">
+    <view class="card section">
+      <text class="section-title">就诊安排与提示</text>
+      <text class="note">请核对下方预约状态、门店、医生及时间，按预约时间到店。预约不代表诊疗已完成；需要调整时可在本页改约或告知取消。</text>
+    </view>
+    <view wx:if="{{pendingOperation}}" class="pending-card">
+      <text class="pending-title">有预约操作结果待核实</text>
+      <text class="note">{{pendingOperation.kind}}的原请求已保留。请返回“我的预约”重试原请求。</text>
+      <button class="secondary" bindtap="goHome">返回我的预约</button>
+    </view>
+    <view class="card">
+      <text class="section-title">预约信息</text>
+      <view class="row"><text class="label">预约编号</text><text class="value">{{appointment.appointment_no}}</text></view>
+      <view class="row"><text class="label">状态</text><text class="value">{{appointment.appointment_status}} · {{appointment.treatment_status}}</text></view>
+      <view class="row"><text class="label">门店</text><text class="value">{{appointment.display_clinic}}</text></view>
+      <view class="row"><text class="label">牙医</text><text class="value">{{appointment.display_dentist}}</text></view>
+      <view class="row"><text class="label">预约时间</text><text class="value">{{appointment.display_start}} – {{appointment.display_end}}</text></view>
+      <view wx:if="{{appointment.display_arrived}}" class="row"><text class="label">到诊时间</text><text class="value">{{appointment.display_arrived}}</text></view>
+      <view wx:if="{{appointment.display_completed}}" class="row"><text class="label">完成时间</text><text class="value">{{appointment.display_completed}}</text></view>
+      <view wx:if="{{appointment.completion_note}}" class="note-block"><text class="label">完成说明</text><text class="note">{{appointment.completion_note}}</text></view>
+    </view>
+
+    <view class="card section">
+      <text class="section-title">已确认项目</text>
+      <view wx:if="{{treatments.length === 0}}" class="state">暂无已确认项目记录</view>
+      <view wx:for="{{treatments}}" wx:key="treatment_id" class="line">
+        <text class="line-title">{{item.name_snapshot}}</text>
+        <text class="line-detail">{{item.units_display}}</text>
+      </view>
+    </view>
+
+    <view class="card section">
+      <text class="section-title">费用</text>
+      <view wx:if="{{!invoice}}" class="state">尚无已发出的结算单</view>
+      <view wx:else>
+        <text class="invoice-meta">结算单 {{invoice.invoice_no}} · {{invoice.display_issued_at}}</text>
+        <view wx:for="{{invoice.lines}}" wx:key="invoice_line_id" class="line">
+          <view class="line-heading">
+            <text class="line-title">{{item.name_snapshot}}</text>
+            <text wx:if="{{item.display_zero_price}}" class="zero-tag">零价项目</text>
+          </view>
+          <text class="line-detail">{{item.units_display}} × ¥{{item.unit_price_snapshot}}</text>
+          <text class="line-subtotal">小计 ¥{{item.subtotal}}</text>
+        </view>
+        <view class="total-row"><text>结算金额</text><text class="total">¥{{invoice.total_amount}}</text></view>
+        <text wx:if="{{invoice.display_zero_total}}" class="state">零额结算已保留服务端原因：{{invoice.zero_amount_reason}}</text>
+      </view>
+      <text class="footnote">金额仅显示服务端已发出的结算事实；此页面不提供支付功能。</text>
+    </view>
+
+    <view wx:if="{{bookingStatus.restricted}}" class="restriction">
+      服务端限制时段：{{bookingStatus.restriction.display_starts_at}} 至 {{bookingStatus.restriction.display_ends_at}}（上海时间）。{{bookingStatus.restriction.reason}}。仍可查询、告知取消或联系前台。
+      <view wx:for="{{clinics}}" wx:key="clinic_id" class="phone-row">
+        <text>{{item.name}}</text>
+        <button wx:if="{{item.phone}}" class="phone-button" data-phone="{{item.phone}}" catchtap="callClinic">拨打 {{item.phone}}</button>
+      </view>
+    </view>
+
+    <view wx:if="{{canCancel || canReschedule}}" class="actions">
+      <text class="note">操作按钮仅按当前页面状态提示；服务端会再次核对到诊、诊疗、结算、时段和版本。</text>
+      <button wx:if="{{canReschedule}}" class="primary" disabled="{{pendingOperation}}" bindtap="rescheduleAppointment">申请改约</button>
+      <button wx:if="{{canCancel}}" class="secondary" disabled="{{pendingOperation}}" bindtap="cancelAppointment">告知取消</button>
+    </view>
+    <view wx:elif="{{appointment.appointment_status === '已到诊' || appointment.attended || treatments.length > 0 || invoice}}" class="state action-note">
+      此安排已有到诊、诊疗或结算事实，不支持患者直接取消或改约，请联系门店前台核实。
+    </view>
+  </block>
+</view>

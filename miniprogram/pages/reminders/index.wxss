@@ -1,0 +1,11 @@
+.inbox { padding: 24rpx; }
+.message { padding: 24rpx; margin-bottom: 18rpx; border-radius: 16rpx; background: #fff; }
+.message-title { font-weight: 700; margin-bottom: 10rpx; color: #17685c; }
+.message-meta { font-size: 24rpx; margin-top: 14rpx; color: #647671; }
+
+/* ===== 科技蓝主题覆盖（2026-11-11） ===== */
+page { background: #f4f8fe; color: #0b1b33; }
+.inbox { padding: 24rpx 28rpx 60rpx; }
+.message { background: #fff; border-radius: 24rpx; padding: 24rpx; margin-bottom: 16rpx; box-shadow: 0 8rpx 24rpx rgba(20,50,110,.06); border-left: 8rpx solid #2f6bff; }
+.message-title { font-size: 27rpx; font-weight: 800; color: #0b1b33; }
+.message-meta { font-size: 21rpx; color: #8c99ac; }

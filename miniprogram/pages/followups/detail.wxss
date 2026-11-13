@@ -1,0 +1,36 @@
+page { min-height: 100%; background: #f6f8f7; color: #19342e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.page { padding: 30rpx; }
+.card { margin-bottom: 20rpx; padding: 30rpx; border-radius: 20rpx; background: #fff; box-shadow: 0 8rpx 28rpx rgba(24, 62, 50, .06); }
+.heading { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; margin-bottom: 12rpx; }
+.title { font-size: 34rpx; font-weight: 700; }
+.status { padding: 6rpx 12rpx; border-radius: 8rpx; color: #276b59; background: #edf5f1; font-size: 22rpx; }
+.row { display: flex; justify-content: space-between; gap: 20rpx; padding: 18rpx 0; border-bottom: 1rpx solid #edf1ef; }
+.label { flex: none; color: #71817b; font-size: 24rpx; }
+.value { text-align: right; font-size: 25rpx; line-height: 1.55; overflow-wrap: anywhere; }
+.overdue-yes { color: #a04a27; font-weight: 650; }
+.recommendation-block { display: flex; flex-direction: column; gap: 12rpx; padding-top: 20rpx; }
+.recommendation { color: #344d45; font-size: 27rpx; line-height: 1.7; overflow-wrap: anywhere; white-space: pre-wrap; }
+.note { color: #62736e; font-size: 23rpx; line-height: 1.7; }
+.state { color: #71817b; font-size: 25rpx; line-height: 1.6; }
+.error { margin: 18rpx 0; padding: 20rpx; border-radius: 12rpx; color: #9a382c; background: #fff0ed; font-size: 24rpx; line-height: 1.5; overflow-wrap: anywhere; }
+.back-button { margin: 18rpx 0; color: #276b59; background: #fff; font-size: 26rpx; }
+.primary { margin-top: 24rpx; color: #fff; background: #20745f; font-size: 26rpx; }
+
+/* Shared patient-service visual system */
+page { background: #f3f7f5; }
+.page { padding: 30rpx 30rpx 72rpx; }
+.card { border: 1rpx solid #e8efeb; border-radius: 24rpx; box-shadow: 0 10rpx 30rpx rgba(24,62,50,.055); }
+.heading { align-items: flex-start; margin-bottom: 18rpx; }
+.title { color: #173f35; font-size: 36rpx; line-height: 1.35; }
+.status { padding: 8rpx 14rpx; border-radius: 12rpx; font-size: 25rpx; }
+.row { align-items: flex-start; padding: 21rpx 0; }
+.label { color: #596d65; font-size: 26rpx; line-height: 1.55; }
+.value { font-size: 28rpx; line-height: 1.6; }
+.recommendation-block { padding-top: 24rpx; }
+.recommendation { font-size: 29rpx; line-height: 1.75; }
+.note { color: #536b61; font-size: 25rpx; line-height: 1.75; }
+.state { padding: 24rpx; border-radius: 14rpx; background: #f5f8f6; font-size: 27rpx; }
+.error { border: 1rpx solid #f0c9c1; border-radius: 16rpx; font-size: 26rpx; line-height: 1.7; }
+button { min-height: 88rpx; border-radius: 16rpx; font-size: 28rpx; font-weight: 650; }
+.primary { background: #176b55; }
+.back-button { border: 1rpx solid #e1ebe6; }

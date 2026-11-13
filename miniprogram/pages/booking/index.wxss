@@ -1,0 +1,102 @@
+page { min-height: 100%; background: #f6f8f7; color: #19342e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.page { padding: 30rpx 28rpx 64rpx; }
+.department-note { display:flex; justify-content:space-between; gap:20rpx; padding:24rpx 0; font-size:25rpx; color:#62736e; }
+.booking-summary { background:#edf6f1; padding:24rpx; border-radius:16rpx; margin-bottom:32rpx; }
+.summary-line { display:block; font-size:27rpx; line-height:1.8; font-weight:600; }
+.banner { padding: 24rpx 8rpx 28rpx; display: flex; flex-direction: column; gap: 10rpx; }
+.eyebrow { color: #25735f; font-size: 23rpx; font-weight: 700; }
+.title { font-size: 40rpx; font-weight: 700; }
+.note, .footnote { color: #62736e; font-size: 24rpx; line-height: 1.6; overflow-wrap: anywhere; }
+.card { padding: 28rpx; border-radius: 18rpx; background: #fff; box-shadow: 0 8rpx 26rpx rgba(24, 62, 50, .06); }
+.section { margin-top: 20rpx; }
+.section-title { display: block; margin-bottom: 18rpx; font-size: 29rpx; font-weight: 700; }
+.source-card { margin-bottom: 18rpx; }
+.source-line { display: block; padding: 5rpx 0; color: #5f716b; font-size: 24rpx; overflow-wrap: anywhere; }
+.followup-card { margin-bottom: 18rpx; border-left: 6rpx solid #2c806a; }
+.followup-row { display: flex; justify-content: space-between; gap: 20rpx; padding: 12rpx 0; color: #62736e; font-size: 24rpx; }
+.followup-recommendation { display: block; margin: 14rpx 0; color: #344d45; font-size: 27rpx; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+.picker { display: flex; justify-content: space-between; gap: 16rpx; padding: 23rpx 0; border-top: 1rpx solid #edf1ef; font-size: 26rpx; }
+.picker text:first-child { color: #71817b; }
+.picker text:last-child { text-align: right; overflow-wrap: anywhere; }
+.field { box-sizing: border-box; width: 100%; margin-top: 14rpx; padding: 20rpx; border: 1rpx solid #dbe5e1; border-radius: 12rpx; font-size: 26rpx; }
+.multiline { min-height: 150rpx; }
+.candidate { display: flex; justify-content: space-between; gap: 14rpx; margin-top: 12rpx; padding: 20rpx; border: 1rpx solid #dbe5e1; border-radius: 12rpx; }
+.candidate-selected { border-color: #20745f; background: #edf5f1; }
+.candidate-time { font-size: 25rpx; line-height: 1.5; }
+.candidate-duration { flex: none; color: #62736e; font-size: 23rpx; }
+.catalog-row { display: flex; justify-content: space-between; gap: 16rpx; padding: 15rpx 0; border-top: 1rpx solid #edf1ef; }
+.catalog-name { font-size: 24rpx; overflow-wrap: anywhere; }
+.catalog-price { color: #62736e; font-size: 23rpx; text-align: right; }
+.state { margin-top: 14rpx; color: #71817b; font-size: 24rpx; line-height: 1.6; }
+.restriction, .notice, .pending-card { margin-bottom: 18rpx; padding: 22rpx; border-radius: 14rpx; background: #fff6df; color: #815317; font-size: 24rpx; line-height: 1.6; overflow-wrap: anywhere; }
+.notice { background: #edf5f1; color: #365c50; }
+.pending-card { border: 1rpx solid #dfbf73; background: #fff8e7; }
+.pending-title { display: block; margin-bottom: 8rpx; color: #725111; font-weight: 700; }
+.phone-row { display: flex; justify-content: space-between; align-items: center; gap: 10rpx; padding: 8rpx 0; }
+.phone-button { flex: none; margin: 0; padding: 0 12rpx; color: #276b59; background: #edf5f1; font-size: 22rpx; }
+button { border-radius: 12rpx; font-size: 26rpx; }
+.primary { margin-top: 18rpx; color: #fff; background: #20745f; }
+.danger { margin-top: 18rpx; color: #fff; background: #a84839; }
+.submit { margin: 24rpx 0; }
+.error { margin-top: 18rpx; padding: 20rpx; border-radius: 12rpx; color: #9a382c; background: #fff0ed; font-size: 24rpx; line-height: 1.5; overflow-wrap: anywhere; }
+.footnote { display: block; margin: 20rpx 8rpx; font-size: 22rpx; }
+
+/* Shared patient-service visual system */
+page { background: #f3f7f5; }
+.page { padding: 30rpx 30rpx 72rpx; }
+.banner { padding: 28rpx 8rpx 32rpx; }
+.eyebrow { color: #176b55; font-size: 25rpx; letter-spacing: 1rpx; }
+.title { color: #173f35; font-size: 42rpx; line-height: 1.3; }
+.note, .footnote { font-size: 25rpx; line-height: 1.7; }
+.card { border: 1rpx solid #e8efeb; border-radius: 24rpx; box-shadow: 0 10rpx 30rpx rgba(24,62,50,.055); }
+.section { margin-top: 24rpx; }
+.section-title { font-size: 32rpx; line-height: 1.4; }
+.followup-card { border-left: 8rpx solid #278069; }
+.followup-row { font-size: 26rpx; line-height: 1.6; }
+.followup-recommendation { font-size: 29rpx; line-height: 1.7; }
+.picker { min-height: 90rpx; align-items: center; font-size: 28rpx; }
+.field { min-height: 92rpx; border-color: #cbd9d2; border-radius: 16rpx; background: #fbfdfc; font-size: 28rpx; line-height: 1.6; }
+.multiline { min-height: 180rpx; }
+.candidate { min-height: 94rpx; align-items: center; border-color: #d7e2dc; border-radius: 16rpx; padding: 22rpx; }
+.candidate-selected { border: 2rpx solid #176b55; background: #e9f4ef; }
+.candidate-time { font-size: 28rpx; font-weight: 650; }
+.candidate-duration { font-size: 25rpx; }
+.catalog-row { align-items: flex-start; padding: 19rpx 0; }
+.catalog-name, .catalog-price { font-size: 25rpx; line-height: 1.6; }
+.catalog-price { color: #526a60; }
+.state { margin-top: 18rpx; padding: 24rpx; border-radius: 14rpx; background: #f5f8f6; font-size: 27rpx; line-height: 1.65; }
+.restriction, .notice, .pending-card, .error { border-radius: 16rpx; font-size: 26rpx; line-height: 1.7; }
+.pending-card { border: 1rpx solid #ead8a8; }
+.pending-title { font-size: 29rpx; }
+button { min-height: 88rpx; font-size: 28rpx; font-weight: 650; }
+.primary { background: #176b55; }
+.danger { background: #a33f33; }
+.phone-button { min-height: 72rpx; font-size: 24rpx; }
+.footnote { font-size: 24rpx; }
+
+.selected-booking{border:2rpx solid #a8dcd5;background:#f6fcfa}.change-selection{margin:12rpx 0 0;background:#e5f3ef;color:#178475;min-height:64rpx;font-size:24rpx;padding:10rpx 18rpx}
+
+/* ===== 科技蓝主题覆盖（2026-11-11） ===== */
+page { background: #f4f8fe; color: #0b1b33; }
+.page { padding: 24rpx 28rpx 220rpx; }
+.card { background: #fff; border-radius: 28rpx; padding: 26rpx; box-shadow: 0 8rpx 24rpx rgba(20,50,110,.06); border: 0; }
+.title { font-size: 28rpx; font-weight: 800; color: #0b1b33; }
+.section-title { font-size: 27rpx; font-weight: 800; color: #0b1b33; }
+.note, .footnote { color: #8c99ac; }
+.selected-booking, .booking-summary { background: #eef4ff; border: 2rpx solid #dbe7ff; border-radius: 24rpx; }
+.summary-line { color: #31425c; }
+.change-selection { color: #2f6bff; font-weight: 700; background: transparent; border: 0; }
+.candidate { background: #fff; border: 2rpx solid #eef2fa; border-radius: 20rpx; }
+.candidate-selected { border-color: #2f6bff; background: #f5f9ff; }
+.catalog-row { border-radius: 18rpx; }
+.catalog-name { color: #0b1b33; font-weight: 650; }
+.catalog-price { color: #2f6bff; font-weight: 750; }
+.primary, .submit { background: linear-gradient(90deg, #2f6bff, #18b6ff) !important; color: #fff !important; border-radius: 20rpx; font-weight: 750; }
+.summary-card, .source-card, .followup-card { background: #eef4ff; border-radius: 24rpx; }
+.pending-card { border-radius: 24rpx; background: #fff8e7; border: 2rpx solid #dfbf73; }
+.notice { background: #fdf6e8; color: #8a5a12; border-radius: 20rpx; }
+.error { background: #fdeeea; color: #b7452f; border-radius: 20rpx; }
+.state { color: #aab6c6; }
+
+/* 过期状态的重新读取按钮 */
+.error .retry-button, .retry-button { background: #fff !important; color: #b7452f !important; border: 2rpx solid #f3c7bd; border-radius: 16rpx; }

@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily dental MySQL backup
+After=mysql.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash /opt/dental-rebuild/backup/dental-backup.sh
+UMask=0077
+PrivateTmp=true
+NoNewPrivileges=true

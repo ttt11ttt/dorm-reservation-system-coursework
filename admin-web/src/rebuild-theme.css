@@ -1,0 +1,22 @@
+/* Rebuild: the approved light clinic palette, no photographs. */
+:root{--ink:#29483d;--muted:#8a9b90;--teal:#168572;--teal-soft:#eaf5ed;--line:#e4ece6;--navy:#29483d;--navy-2:#38624d;background:#f5f8f5;color:var(--ink)}
+body,.workspace,.app-shell{background:#f5f8f5;color:#29483d}
+.sidebar{background:white;color:#456453;box-shadow:none;border-right:1px solid #e6eee7;width:240px;flex-basis:240px}
+.sidebar-brand{border-color:#eef3ed}.sidebar-brand strong{color:#29483d;font-size:18px}.sidebar-brand small{color:#9baca0}
+.sidebar-brand .brand-mark,.brand-mark{background:#168572;color:white;border-radius:12px;font-size:16px;box-shadow:none}
+.nav-label{color:#a3b1a5}.nav-item{color:#7a8f7e}.nav-item:hover{color:#168572;background:#f3f8f1;transform:none}
+.nav-item.active{background:#eaf5ed;color:#168572;box-shadow:none;font-weight:600}.nav-item.active .nav-icon,.nav-icon{background:transparent;color:inherit}
+.clinic-switcher{background:#f7faf6;border:1px solid #e4ece2}.clinic-switcher:before{background:#8bbd9f}.clinic-switcher strong{color:#53775e}.clinic-switcher small,.clinic-switcher>span{color:#9aad9b}
+.scope-card{background:#f7faf6;border-color:#e7eee4}.scope-card strong{color:#688d70}.scope-card>span:last-child>small:last-child{color:#9aad9b}
+.role-chip-list small{color:#72937a;background:#edf5eb;border-color:#e0ebde}.scope-shield{background:#eaf4e7;color:#78a484}
+.sidebar-bottom{border-color:#ecf1e9}.user-meta strong{color:#55745b}.user-meta small,.sidebar-version{color:#9eaf9e}.avatar-inverse{background:#edf6e9;color:#5d8967;border-color:#e3edde}.logout-icon{color:#7d9b80}
+.topbar{background:#fff;border-bottom-color:#e5ede4;box-shadow:none}.connection-state{background:#f4faf1;border-color:#e4eddf;color:#6b9274}
+.workspace-content{padding:32px 36px 55px}.page-heading h1{color:#29483d;font-size:27px;letter-spacing:.5px}.eyebrow{color:#9aaf9c;letter-spacing:2px}
+.panel{border:1px solid #e4ece2;border-radius:16px;background:white;box-shadow:none}.metric-card,.stat-card{border-radius:14px;box-shadow:none;border-color:#e6eee3}
+.button{border-radius:8px}.button-primary{background:#168572}.button-secondary{border-color:#dfeadc;color:#6c8d70}
+table{color:#45694e}th{background:#f6faf3;color:#94a98f;font-weight:500}td{border-color:#edf3e8}tbody tr:hover{background:#fcfefa}
+input,select,textarea{border-color:#dfe9da;border-radius:8px}.badge{border-radius:6px}.notice-info{background:#f3f8ef;border-color:#e1ebd9;color:#849c78}
+.login-shell{background:#f5f8f5}.login-card{background:#fff}.login-aside{background:linear-gradient(140deg,#e7f2e6,#f1f7ea);color:#416f50}
+.aside-copy h2{color:#355d42}.aside-copy p{color:#8ba080}.eyebrow-light{color:#95b08a}.login-steps li{background:#ffffff80;border-color:#dfead8;color:#64845b}.login-steps li>span{background:#fff;color:#709c6c}.login-steps strong{color:#5c8258}.login-steps small,.aside-meta{color:#9aab8e}
+.aside-orbit{border-color:#d9e9d080}.aside-grid{opacity:.1}.login-brand strong{color:#355d42}.login-foot{color:#a1b098}
+@media(max-width:760px){.sidebar{background:white}.workspace-content{padding:20px 14px 90px}.mobile-nav button.active{background:#edf6e9;color:#168572}.login-aside{min-height:230px}}

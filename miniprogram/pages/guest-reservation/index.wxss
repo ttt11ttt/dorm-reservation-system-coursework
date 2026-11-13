@@ -1,0 +1,20 @@
+page { min-height:100%; background:#f3f7f5; color:#19342e; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+.page { padding:30rpx 30rpx 72rpx; }
+.banner { display:flex; flex-direction:column; gap:10rpx; padding:28rpx 8rpx 32rpx; }
+.eyebrow { color:#176b55; font-size:25rpx; font-weight:700; }
+.title { color:#173f35; font-size:42rpx; font-weight:700; }
+.note,.footnote { color:#62736e; font-size:25rpx; line-height:1.7; overflow-wrap:anywhere; }
+.card { padding:28rpx; border:1rpx solid #e8efeb; border-radius:24rpx; background:#fff; box-shadow:0 10rpx 30rpx rgba(24,62,50,.055); }
+.status { display:block; margin-bottom:16rpx; padding:18rpx; border-radius:14rpx; background:#e9f4ef; color:#205e4c; font-size:27rpx; font-weight:700; line-height:1.5; }
+.row { display:flex; justify-content:space-between; align-items:flex-start; gap:24rpx; padding:19rpx 0; border-bottom:1rpx solid #edf1ef; }
+.label { flex:none; color:#596d65; font-size:26rpx; }
+.value { min-width:0; color:#263f43; font-size:27rpx; line-height:1.55; text-align:right; overflow-wrap:anywhere; }
+.block-row { flex-direction:column; gap:10rpx; }
+.multiline { width:100%; text-align:left; white-space:pre-wrap; }
+.notice,.error { margin-top:20rpx; padding:22rpx; border-radius:16rpx; font-size:25rpx; line-height:1.7; overflow-wrap:anywhere; }
+.notice { background:#edf5f1; color:#365c50; }
+.error { border:1rpx solid #f0c9c1; background:#fff0ed; color:#9a382c; }
+.state { color:#71817b; font-size:27rpx; line-height:1.65; }
+button { min-height:88rpx; margin-top:20rpx; border-radius:16rpx; font-size:28rpx; font-weight:650; }
+.primary { color:#fff; background:#176b55; }
+.footnote { display:block; margin:25rpx 5rpx; padding-bottom:10rpx; font-size:24rpx; }

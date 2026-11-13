@@ -1,0 +1,23 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/catalog/index",
+    "pages/records/index",
+    "pages/appointment/index",
+    "pages/booking/index",
+    "pages/guest-booking/index",
+    "pages/guest-reservation/index",
+    "pages/followups/index",
+    "pages/followups/detail",
+    "pages/reminders/index",
+    "pages/profile/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "患者服务",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f4f8fe"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

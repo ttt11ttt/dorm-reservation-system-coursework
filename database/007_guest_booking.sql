@@ -1,0 +1,85 @@
+-- Additive guest booking schema. Apply only after a reviewed deployment; this file is not executed by the build.
+CREATE TABLE guest_subjects (
+  guest_subject_id BIGINT PRIMARY KEY,
+  wechat_app_id VARBINARY(128) NOT NULL,
+  wechat_open_id VARBINARY(128) NOT NULL,
+  conversion_verified_patient_id BIGINT NULL,
+  ever_verified_patient_id BIGINT NULL,
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL,
+  UNIQUE KEY uq_guest_wechat (wechat_app_id,wechat_open_id),
+  CONSTRAINT fk_guest_verified_patient FOREIGN KEY (ever_verified_patient_id) REFERENCES patients(patient_id),
+  CONSTRAINT fk_guest_conversion_patient FOREIGN KEY (conversion_verified_patient_id) REFERENCES patients(patient_id)
+);
+CREATE TABLE guest_sessions (
+  token_digest CHAR(64) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,
+  guest_subject_id BIGINT NOT NULL,
+  expires_at DATETIME NOT NULL,
+  revoked_at DATETIME NULL,
+  created_at DATETIME NOT NULL,
+  KEY ix_guest_session_subject (guest_subject_id),
+  CONSTRAINT fk_guest_session_subject FOREIGN KEY (guest_subject_id) REFERENCES guest_subjects(guest_subject_id)
+);
+CREATE TABLE guest_reservations (
+  guest_reservation_id BIGINT PRIMARY KEY,
+  reservation_no VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  guest_subject_id BIGINT NOT NULL,
+  clinic_id BIGINT NOT NULL,
+  dentist_id BIGINT NOT NULL,
+  schedule_id BIGINT NOT NULL,
+  scheduled_start DATETIME NOT NULL,
+  scheduled_end DATETIME NOT NULL,
+  contact_name VARCHAR(80) NOT NULL,
+  contact_phone VARCHAR(32) NOT NULL,
+  requested_treatments TEXT NOT NULL,
+  special_needs TEXT NULL,
+  reservation_status VARCHAR(16) NOT NULL,
+  row_version INT NOT NULL DEFAULT 0,
+  cancelled_at DATETIME NULL,
+  change_reason TEXT NULL,
+  converted_appointment_id BIGINT NULL,
+  conversion_evidence VARCHAR(80) NULL,
+  created_at DATETIME NOT NULL,
+  UNIQUE KEY uq_guest_reservation_no (reservation_no),
+  UNIQUE KEY uq_guest_converted_appointment (converted_appointment_id),
+  KEY ix_guest_dentist_slot (dentist_id,reservation_status,scheduled_start,scheduled_end),
+  KEY ix_guest_owner (guest_subject_id,created_at),
+  CONSTRAINT fk_guest_reservation_subject FOREIGN KEY (guest_subject_id) REFERENCES guest_subjects(guest_subject_id),
+  CONSTRAINT fk_guest_reservation_clinic FOREIGN KEY (clinic_id) REFERENCES clinics(clinic_id),
+  CONSTRAINT fk_guest_reservation_dentist FOREIGN KEY (dentist_id) REFERENCES dentists(dentist_id),
+  CONSTRAINT fk_guest_reservation_schedule FOREIGN KEY (schedule_id) REFERENCES dentist_schedules(schedule_id),
+  CONSTRAINT fk_guest_reservation_appointment FOREIGN KEY (converted_appointment_id) REFERENCES appointments(appointment_id),
+  CONSTRAINT ck_guest_slot CHECK (scheduled_start < scheduled_end)
+);
+CREATE TABLE guest_restrictions (
+  guest_restriction_id BIGINT PRIMARY KEY,
+  guest_subject_id BIGINT NOT NULL,
+  starts_at DATETIME NOT NULL,
+  ends_at DATETIME NOT NULL,
+  revoked_at DATETIME NULL,
+  reviewed_by BIGINT NULL,
+  review_reason TEXT NULL,
+  created_at DATETIME NOT NULL,
+  KEY ix_guest_restriction_subject (guest_subject_id,ends_at),
+  CONSTRAINT fk_guest_restriction_subject FOREIGN KEY (guest_subject_id) REFERENCES guest_subjects(guest_subject_id),
+  CONSTRAINT fk_guest_restriction_staff FOREIGN KEY (reviewed_by) REFERENCES accounts(account_id)
+);
+CREATE TABLE guest_breaches (
+  guest_breach_id BIGINT PRIMARY KEY,
+  guest_reservation_id BIGINT NOT NULL,
+  guest_subject_id BIGINT NOT NULL,
+  breach_kind VARCHAR(24) NOT NULL,
+  occurred_at DATETIME NOT NULL,
+  valid TINYINT(1) NOT NULL DEFAULT 1,
+  exempt TINYINT(1) NOT NULL DEFAULT 0,
+  responsibility_reason TEXT NULL,
+  restriction_id BIGINT NULL,
+  updated_by BIGINT NULL,
+  updated_at DATETIME NULL,
+  UNIQUE KEY uq_guest_breach_reservation (guest_reservation_id),
+  KEY ix_guest_breach_subject (guest_subject_id,occurred_at),
+  CONSTRAINT fk_guest_breach_reservation FOREIGN KEY (guest_reservation_id) REFERENCES guest_reservations(guest_reservation_id),
+  CONSTRAINT fk_guest_breach_subject FOREIGN KEY (guest_subject_id) REFERENCES guest_subjects(guest_subject_id),
+  CONSTRAINT fk_guest_breach_restriction FOREIGN KEY (restriction_id) REFERENCES guest_restrictions(guest_restriction_id),
+  CONSTRAINT fk_guest_breach_staff FOREIGN KEY (updated_by) REFERENCES accounts(account_id)
+);
