@@ -61,6 +61,97 @@ const exactRetry = computed(() => !!retryBody && !!pending.value && pending.valu
 const manualRetry = computed(() => scheduleManualRetryAllowed({ marker: pending.value, actorAccountId: String(props.identity.accountId), clinicId: clinicId.value, scheduleId: form.value.scheduleId, dentistId: form.value.dentistId, openingId: form.value.openingId, scope: scope.value, clinicInspected: clinicInspected.value && manualRetypeReady.value, scheduleInspected: scheduleInspected.value, openingInspected: openingInspected.value }))
 const createLocked = computed(() => markerBlocked.value || otherActor.value || !!pending.value && !manualRetry.value && !exactRetry.value && !manualRetypeReady.value)
 
+// ---- 出诊看板：门店下拉 + 医生 × 时间轴 ----
+const clinicsList = ref<{ id: string; name: string }[]>([])
+const dentistNames = ref<Record<string, string>>({})
+const boardDate = ref(new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Shanghai' }).format(new Date()))
+const boardDateInput = ref(boardDate.value)
+const boardItems = ref<{ id: string; name: string; startAt: string; endAt: string; status: string }[]>([])
+const boardBusy = ref(false)
+const boardError = ref('')
+const hhmm = (iso: string) => new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(iso))
+const dayKey = (iso: string) => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Shanghai' }).format(new Date(iso))
+const minutesOf = (iso: string) => { const [h, m] = hhmm(iso).split(':').map(Number); return h * 60 + m }
+const DAY_START = 9 * 60
+const DAY_SPAN = 12 * 60
+const boardDays = computed(() => Array.from(new Set(items.value.map((row) => dayKey(row.startAt)))).sort())
+const boardSource = computed(() => {
+  if (boardItems.value.length) return boardItems.value
+  return items.value
+    .filter((row) => dayKey(row.startAt) === boardDate.value)
+    .map((row) => ({
+      id: String(row.scheduleId),
+      name: dentistNames.value[String(row.dentistId)] || `牙医 #${row.dentistId}`,
+      startAt: row.startAt,
+      endAt: row.endAt,
+      status: row.status
+    }))
+})
+const boardRows = computed(() => {
+  const byDentist = new Map<string, { id: string; name: string; startAt: string; endAt: string; status: string }[]>()
+  for (const row of boardSource.value) {
+    if (!byDentist.has(row.name)) byDentist.set(row.name, [])
+    byDentist.get(row.name)!.push(row)
+  }
+  return Array.from(byDentist.entries())
+    .map(([name, list]) => ({
+      id: name,
+      name,
+      blocks: list
+        .slice()
+        .sort((a, b) => minutesOf(a.startAt) - minutesOf(b.startAt))
+        .map((row) => ({
+          id: row.id,
+          status: row.status,
+          label: `${hhmm(row.startAt)}–${hhmm(row.endAt)}`,
+          left: Math.max(0, ((minutesOf(row.startAt) - DAY_START) / DAY_SPAN) * 100),
+          width: Math.max(2, ((minutesOf(row.endAt) - minutesOf(row.startAt)) / DAY_SPAN) * 100)
+        }))
+    }))
+})
+async function loadBoard() {
+  if (!clinicId.value) { boardError.value = '请先选择门店'; return }
+  const date = boardDateInput.value
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { boardError.value = '日期格式应为 YYYY-MM-DD'; return }
+  boardBusy.value = true; boardError.value = ''
+  try {
+    const rows = await api<Record<string, unknown>[]>(`/org/clinics/${encodeURIComponent(clinicId.value)}/upcoming-schedules?date=${encodeURIComponent(date)}`)
+    boardItems.value = (Array.isArray(rows) ? rows : []).map((row) => ({
+      id: String(row.schedule_id ?? row.scheduleId ?? ''),
+      name: String(row.dentist_name ?? row.dentistName ?? '牙医'),
+      startAt: String(row.start_at ?? row.startAt ?? ''),
+      endAt: String(row.end_at ?? row.endAt ?? ''),
+      status: '有效'
+    }))
+    boardDate.value = date
+  } catch (error) {
+    boardError.value = error instanceof Error ? error.message : '读取当天排班失败'
+    boardItems.value = []
+  } finally {
+    boardBusy.value = false
+  }
+}
+async function loadDirectory() {
+  try {
+    const clinics = await api<unknown>('/org/clinics')
+    const list = Array.isArray(clinics) ? clinics : (clinics as { items?: unknown[] }).items || []
+    clinicsList.value = (list as Record<string, unknown>[]).map((row) => ({
+      id: String(row.clinicId ?? row.clinic_id),
+      name: String(row.name ?? '')
+    })).filter((row) => row.id && row.id !== 'undefined')
+  } catch { /* 目录读取失败时保留手工输入 */ }
+  try {
+    const dentists = await api<unknown>('/org/dentists')
+    const list = Array.isArray(dentists) ? dentists : (dentists as { items?: unknown[] }).items || []
+    const map: Record<string, string> = {}
+    for (const row of list as Record<string, unknown>[]) {
+      const id = String(row.dentistId ?? row.dentist_id)
+      if (id && id !== 'undefined') map[id] = String(row.name ?? '')
+    }
+    dentistNames.value = map
+  } catch { /* 忽略：看板退回显示编号 */ }
+}
+
 function storage() { return window.sessionStorage }
 function wipeRetryBody() { if (retryBody) { retryBody.startAt = ''; retryBody.endAt = '' }; retryBody = null }
 function clearPrivate() { wipeRetryBody(); form.value = { scheduleId: '', dentistId: '', openingId: '', startLocal: '', endLocal: '' }; detail.value = null; opening.value = null; receipt.value = null; getAfterPostError.value = '' }
@@ -227,7 +318,7 @@ watch(clinicId, (value) => { if (confirmedClinic.value && value.trim() !== Strin
 watch(() => props.identity, () => { actorGeneration.value += 1; writeLane.invalidate(); writeBusy.value = false; resetReads(); clinicId.value = ''; restoreMarker() }, { flush: 'sync' })
 function onSessionExpired() { actorGeneration.value += 1; writeLane.invalidate(); writeBusy.value = false; resetReads(); clinicId.value = '' }
 watch(() => props.selectedClinicId, async value => { if(value && value!==clinicId.value){ clinicId.value=value; await confirmClinic() } })
-onMounted(() => { restoreMarker(); if(props.selectedClinicId && !pending.value){ clinicId.value=props.selectedClinicId; void confirmClinic() }; window.addEventListener('adc:session-expired', onSessionExpired) })
+onMounted(() => { restoreMarker(); void loadDirectory(); if(props.selectedClinicId && !pending.value){ clinicId.value=props.selectedClinicId; void confirmClinic() }; window.addEventListener('adc:session-expired', onSessionExpired) })
 onUnmounted(() => { window.removeEventListener('adc:session-expired', onSessionExpired); disposed.value = true; actorGeneration.value += 1; clinicLane.invalidate(); listLane.invalidate(); detailLane.invalidate(); openingLane.invalidate(); writeLane.invalidate(); clearPrivate(); confirmedClinic.value = null; items.value = [] })
 </script>
 
@@ -244,12 +335,33 @@ onUnmounted(() => { window.removeEventListener('adc:session-expired', onSessionE
       <div class="opening-actions"><button class="button button-quiet" :disabled="otherActor || clinicBusy || !clinicInspected || detailBusy || openingBusy" @click="inspectPending">显式读取原出诊与开放</button><button v-if="scheduleInspected && openingInspected && clinicInspected && !manualRetypeReady && pending.state !== 'sending' && !otherActor" class="button button-quiet" @click="prepareManualRetype">按原ID人工重填</button><button v-if="exactRetry" class="button" :disabled="writeBusy" @click="submit(true)">沿原ID和原请求重试</button></div>
     </section>
 
-    <div class="opening-grid opening-select"><label>门店ID<input v-model="clinicId" inputmode="numeric" autocomplete="off" placeholder="输入当前获权门店ID"></label><div class="opening-actions"><button class="button" :disabled="!access.allowed || clinicBusy" @click="confirmClinic">{{ clinicBusy ? '正在读取…' : '显式读取并确认门店' }}</button><button v-if="confirmedClinic" class="button button-quiet" :disabled="listBusy" @click="loadSchedules(false)">重新读取出诊</button></div></div>
+    <div class="opening-grid opening-select"><label>门店<select v-if="clinicsList.length" v-model="clinicId"><option v-for="c in clinicsList" :key="c.id" :value="c.id">{{ c.name }}</option></select><input v-else v-model="clinicId" inputmode="numeric" autocomplete="off" placeholder="输入当前获权门店ID"></label><div class="opening-actions"><button class="button" :disabled="!access.allowed || clinicBusy || !clinicId" @click="confirmClinic">{{ clinicBusy ? '正在读取…' : '读取该门店出诊' }}</button><button v-if="confirmedClinic" class="button button-quiet" :disabled="listBusy" @click="loadSchedules(false)">重新读取出诊</button></div></div>
     <p v-if="clinicError" class="form-error" role="alert">{{ clinicError }}</p>
     <p v-if="confirmedClinic" class="opening-confirmed">已确认：{{ confirmedClinic.name }} · #{{ confirmedClinic.clinicId }} · {{ confirmedClinic.active ? '门店启用' : '门店停用' }}</p>
 
+    <section v-if="confirmedClinic && items.length" class="schedule-board">
+      <div class="board-head">
+        <div><h3>出诊看板 · {{ boardDate }}</h3><p class="muted">按医生查看当天出诊时段；原始明细在下方折叠区，可核对 ID 与版本</p>
+          <div class="board-date"><input v-model="boardDateInput" type="date"><button class="button button-quiet" :disabled="boardBusy || !clinicId" @click="loadBoard">{{ boardBusy ? '读取中…' : '读取该日排班' }}</button></div>
+          <p v-if="boardError" class="form-error">{{ boardError }}</p></div>
+        <div class="daychips"><button v-for="d in boardDays" :key="d" class="daychip" :class="{ on: d === boardDate }" @click="boardDate = d; boardDateInput = d; boardItems = []">{{ d.slice(5) }}</button></div>
+      </div>
+      <div class="board-hours"><span></span><div class="board-marks"><span>09:00</span><span>12:00</span><span>15:00</span><span>18:00</span><span>21:00</span></div></div>
+      <div class="lanes">
+        <div v-for="row in boardRows" :key="row.id" class="lane-row">
+          <div class="lane-doc"><span class="lane-ava">{{ row.name.slice(0, 1) }}</span><div><b>{{ row.name }}</b><small v-if="/^\d+$/.test(row.id)">#{{ row.id }}</small><small v-else>当天出诊</small></div></div>
+          <div class="lane">
+            <span v-for="t in [25, 50, 75]" :key="t" class="lane-tick" :style="{ left: t + '%' }"></span>
+            <span v-for="b in row.blocks" :key="b.id" class="lane-block" :class="{ off: b.status === '撤销' }" :style="{ left: b.left + '%', width: b.width + '%' }" :title="b.label">{{ b.label }}</span>
+          </div>
+        </div>
+        <p v-if="!boardRows.length" class="muted">{{ boardDate }} 当天没有出诊记录，可切换其他日期。</p>
+      </div>
+      <div class="board-legend"><span><i class="lg-on"></i>有效出诊</span><span><i class="lg-off"></i>已撤销</span><span class="muted">时间轴 09:00 – 21:00（上海时间）</span></div>
+    </section>
+
     <section v-if="confirmedClinic" class="opening-list"><div class="section-heading"><h3>出诊记录</h3><span class="muted">{{ items.length }} 条</span></div><p v-if="listBusy && !items.length" class="muted">正在读取出诊…</p><p v-else-if="!items.length && !listError" class="muted">该门店当前没有已读取的出诊记录。</p><p v-if="listError" class="form-error" role="alert">{{ listError }}</p>
-      <div v-if="items.length" class="opening-table-wrap"><table><thead><tr><th>出诊ID</th><th>牙医ID</th><th>开放ID</th><th>开始（上海）</th><th>结束（上海）</th><th>状态</th><th>计数</th><th></th></tr></thead><tbody><tr v-for="row in items" :key="row.scheduleId"><td><span class="mono">#{{ row.scheduleId }}</span></td><td><span class="mono">#{{ row.dentistId }}</span></td><td><span class="mono">#{{ row.openingId }}</span></td><td>{{ formatShanghai(row.startAt) }}</td><td>{{ formatShanghai(row.endAt) }}</td><td><span class="badge">{{ row.status }}</span></td><td>{{ row.mutationCount }}</td><td><button class="button button-quiet" @click="openDetail(row)">查看详情</button></td></tr></tbody></table></div>
+      <details class="raw-details"><summary>原始明细（含 ID，便于核对）</summary><div v-if="items.length" class="opening-table-wrap"><table><thead><tr><th>出诊ID</th><th>牙医ID</th><th>开放ID</th><th>开始（上海）</th><th>结束（上海）</th><th>状态</th><th>计数</th><th></th></tr></thead><tbody><tr v-for="row in items" :key="row.scheduleId"><td><span class="mono">#{{ row.scheduleId }}</span></td><td><span class="mono">#{{ row.dentistId }}</span></td><td><span class="mono">#{{ row.openingId }}</span></td><td>{{ formatShanghai(row.startAt) }}</td><td>{{ formatShanghai(row.endAt) }}</td><td><span class="badge">{{ row.status }}</span></td><td>{{ row.mutationCount }}</td><td><button class="button button-quiet" @click="openDetail(row)">查看详情</button></td></tr></tbody></table></div></details>
       <div v-if="page.hasMore" class="opening-actions"><button class="button button-quiet" :disabled="listBusy" @click="loadSchedules(true)">继续读取</button></div>
     </section>
 
@@ -268,7 +380,33 @@ onUnmounted(() => { window.removeEventListener('adc:session-expired', onSessionE
 </template>
 
 <style scoped>
-.schedule-workbench{display:grid;gap:16px;padding:20px;min-width:0}.schedule-workbench h2,.schedule-workbench h3,.schedule-workbench h4{margin:0}.opening-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.opening-grid label{display:grid;gap:6px;font-size:13px;font-weight:650}.opening-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.opening-select{align-items:end}.opening-confirmed{margin:0;color:#216454;font-weight:650;line-height:1.55}.opening-list,.opening-detail,.opening-create,.opening-recovery,.opening-receipt{display:grid;gap:12px;padding-top:14px;border-top:1px solid var(--line)}.opening-table-wrap{overflow-x:auto}.opening-table-wrap table{width:100%;border-collapse:collapse;min-width:980px}.opening-table-wrap th,.opening-table-wrap td{text-align:left;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}.opening-details{display:grid;grid-template-columns:minmax(110px,180px) 1fr;gap:8px;margin:0}.opening-details dt{color:var(--muted)}.opening-details dd{margin:0;overflow-wrap:anywhere}.opening-private{color:var(--muted);font-size:12px}.schedule-workbench fieldset{border:0;padding:0;margin:0;min-width:0}.opening-receipt{padding:12px;border:1px solid var(--line);border-radius:10px}.schedule-workbench .section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}@media(max-width:680px){.opening-grid{grid-template-columns:1fr}.opening-details{grid-template-columns:1fr}.opening-details dt{font-weight:700}}
+.schedule-workbench{display:grid;gap:16px;padding:20px;min-width:0}
+.schedule-board{display:grid;gap:12px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#fff}
+.board-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.board-head h3{font-size:16px;margin:0 0 4px}.board-date{display:flex;align-items:center;gap:8px;margin-top:8px}.board-date input{height:34px;border:1px solid var(--line-2);border-radius:9px;padding:0 10px;font-size:12.5px}
+.board-head .muted{margin:0;font-size:12px;color:var(--ink-400)}
+.daychips{display:flex;gap:6px;flex-wrap:wrap}
+.daychip{border:1px solid var(--line-2);background:#fff;color:var(--ink-500);border-radius:9px;padding:6px 10px;font-size:12px;font-weight:650}
+.daychip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.board-hours{display:grid;grid-template-columns:150px 1fr;gap:14px;font-size:10.5px;color:var(--ink-400)}
+.board-marks{display:flex;justify-content:space-between}
+.lanes{display:grid;gap:8px}
+.lane-row{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:center}
+.lane-doc{display:flex;align-items:center;gap:9px}
+.lane-ava{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:#e8f0ff;color:#1b4fd8;font-size:12px;font-weight:700;flex:0 0 28px}
+.lane-doc b{display:block;font-size:12.5px;color:var(--ink-900)}
+.lane-doc small{color:var(--ink-300);font-size:10.5px}
+.lane{position:relative;height:38px;border-radius:10px;background:linear-gradient(90deg,#f7faff,#f2f7ff);overflow:hidden}
+.lane-tick{position:absolute;top:0;bottom:0;width:1px;background:#e6eefb}
+.lane-block{position:absolute;top:6px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:11px;font-weight:650;color:#0d3f9e;background:linear-gradient(180deg,#deebff,#cfe1ff);border:1px solid #c3d8ff;white-space:nowrap;overflow:hidden}
+.lane-block.off{color:#8c99ac;background:#f1f5fb;border-color:#e8eef8;text-decoration:line-through}
+.board-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-500)}
+.board-legend i{display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:6px}
+.lg-on{background:#cfe1ff;border:1px solid #c3d8ff}
+.lg-off{background:#f1f5fb;border:1px solid #e8eef8}
+.raw-details{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.raw-details summary{cursor:pointer;font-size:12.5px;color:var(--ink-500);font-weight:650}
+.schedule-workbench .opening-select select{height:40px;border:1px solid var(--line-2);border-radius:10px;padding:0 12px;background:#fff;font-size:13.5px;min-width:240px}.schedule-workbench h2,.schedule-workbench h3,.schedule-workbench h4{margin:0}.opening-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.opening-grid label{display:grid;gap:6px;font-size:13px;font-weight:650}.opening-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.opening-select{align-items:end}.opening-confirmed{margin:0;color:#216454;font-weight:650;line-height:1.55}.opening-list,.opening-detail,.opening-create,.opening-recovery,.opening-receipt{display:grid;gap:12px;padding-top:14px;border-top:1px solid var(--line)}.opening-table-wrap{overflow-x:auto}.opening-table-wrap table{width:100%;border-collapse:collapse;min-width:980px}.opening-table-wrap th,.opening-table-wrap td{text-align:left;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}.opening-details{display:grid;grid-template-columns:minmax(110px,180px) 1fr;gap:8px;margin:0}.opening-details dt{color:var(--muted)}.opening-details dd{margin:0;overflow-wrap:anywhere}.opening-private{color:var(--muted);font-size:12px}.schedule-workbench fieldset{border:0;padding:0;margin:0;min-width:0}.opening-receipt{padding:12px;border:1px solid var(--line);border-radius:10px}.schedule-workbench .section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}@media(max-width:680px){.opening-grid{grid-template-columns:1fr}.opening-details{grid-template-columns:1fr}.opening-details dt{font-weight:700}}
 </style>
 
 
