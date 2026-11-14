@@ -190,6 +190,7 @@ class GuestBookingService {
         long patient=Store.parseId(request.patientId());var candidate=row(id);long clinic=Store.number(candidate,"clinic_id"),dentist=Store.number(candidate,"dentist_id");actor.front(clinic);
         var clinicRow=db.one("SELECT active FROM clinics WHERE clinic_id=? FOR UPDATE",clinic);var dentistRow=db.one("SELECT active FROM dentists WHERE dentist_id=? FOR UPDATE",dentist);
         var p=db.one("SELECT active FROM patients WHERE patient_id=? FOR UPDATE",patient);
+        BookingService.requirePatientAtClinic(db,patient,clinic);
         var coverage=rules.lockCoverage(Store.number(candidate,"schedule_id"),clinic,dentist);
         var owner=db.one("SELECT guest_subject_id,ever_verified_patient_id,conversion_verified_patient_id FROM guest_subjects WHERE guest_subject_id=? FOR UPDATE",candidate.get("guest_subject_id"));
         if(owner.get("ever_verified_patient_id")!=null&&Store.number(owner,"ever_verified_patient_id")!=patient)throw ApiError.conflict("VERIFIED_IDENTITY_CONFLICT");

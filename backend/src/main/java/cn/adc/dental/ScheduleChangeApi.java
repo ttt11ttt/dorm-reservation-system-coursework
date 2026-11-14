@@ -22,7 +22,8 @@ class ScheduleChangeApi {
     @GetMapping("/clinics/{id}/upcoming-schedules")
     Object upcoming(@RequestHeader(value="Authorization",required=false) String header,
                     @PathVariable String id, @RequestParam String date) {
-        OrganizationRules.chainOnly(identity.require(header));
+        long clinic=Store.parseId(id);
+        OrganizationRules.clinicRead(identity.require(header),clinic);
         var day = ExpenseRules.date(date);
         var start = Timestamp.from(day.atStartOfDay(CatalogPolicy.ZONE).toInstant());
         var end = Timestamp.from(day.plusDays(1).atStartOfDay(CatalogPolicy.ZONE).toInstant());
@@ -31,16 +32,16 @@ class ScheduleChangeApi {
             FROM dentist_schedules s JOIN dentists d ON d.dentist_id=s.dentist_id
             WHERE s.clinic_id=? AND s.status='有效' AND s.start_at<? AND s.end_at>? AND s.end_at>?
             ORDER BY s.start_at,s.schedule_id LIMIT 100
-            """,Store.parseId(id),end,start,db.now()));
+            """,clinic,end,start,db.now()));
     }
 
     @GetMapping("/schedules/{id}/affected-appointments")
     Object affected(@RequestHeader(value="Authorization",required=false) String header,
                     @PathVariable String id, @RequestParam(required=false) String endAt) {
         var actor = identity.require(header);
-        OrganizationRules.chainOnly(actor);
         long schedule = Store.parseId(id);
-        db.one("SELECT schedule_id FROM dentist_schedules WHERE schedule_id=?",schedule);
+        var row=db.one("SELECT clinic_id FROM dentist_schedules WHERE schedule_id=?",schedule);
+        OrganizationRules.clinicRead(actor,Store.number(row,"clinic_id"));
         return Store.json(affected(schedule, endAt == null ? db.now() : Store.offset(endAt)));
     }
 
@@ -49,14 +50,15 @@ class ScheduleChangeApi {
     Object change(@RequestHeader(value="Authorization",required=false) String header,
                   @PathVariable String id, @RequestBody Change request) {
         var actor = identity.require(header);
-        OrganizationRules.chainOnly(actor);
         String reason = OrganizationRules.label(request.reason(),500);
         long schedule = Store.parseId(id);
         var parent = db.one("SELECT clinic_id,dentist_id FROM dentist_schedules WHERE schedule_id=?",schedule);
+        OrganizationRules.clinicRead(actor,Store.number(parent,"clinic_id"));
         // Booking and rescheduling take the clinic and dentist locks in the same order.
         db.one("SELECT clinic_id FROM clinics WHERE clinic_id=? FOR UPDATE",parent.get("clinic_id"));
         db.one("SELECT dentist_id FROM dentists WHERE dentist_id=? FOR UPDATE",parent.get("dentist_id"));
         var old = db.one("SELECT * FROM dentist_schedules WHERE schedule_id=? FOR UPDATE",schedule);
+        OrganizationRules.clinicRead(actor,Store.number(old,"clinic_id"));
         if (!Long.toString(Store.number(old,"row_version")).equals(request.expectedVersion())) {
             throw ApiError.conflict("ROW_VERSION_CONFLICT");
         }

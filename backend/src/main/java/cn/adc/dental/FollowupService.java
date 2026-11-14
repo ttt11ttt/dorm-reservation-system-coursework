@@ -123,7 +123,9 @@ class FollowupService {
         boolean patient=mode==EncounterAccess.Mode.PATIENT,dentist=mode==EncounterAccess.Mode.DENTIST;
         FollowupRules.page(status,overdueOnly,limit);long after=afterId==null?0:Store.parseId(afterId);
         FollowupRules.DentistListScope dentistScope=null;
-        if(patient)actor.patient();else if(dentist)actor.front(clinic);else actor.front(clinic);
+        if(patient)actor.patient();
+        else if(dentist)dentistScope=FollowupRules.dentistListScope(actor,clinic,status,afterId,limit);
+        else actor.front(clinic);
         var date=FollowupRules.today(db.clock);var sql=new StringBuilder("SELECT "+PLAN+" FROM followup_plans WHERE "+(patient?"patient_id":"clinic_id")+"=? AND followup_plan_id>?");var args=new ArrayList<Object>();args.add(patient?actor.patientId():clinic);args.add(after);
         if(dentistScope!=null) { sql.append(" AND dentist_id=?");args.add(dentistScope.dentist()); }
         if(!status.equals("all")){sql.append(" AND status=?");args.add(status);}if(overdueOnly){sql.append(" AND status='待复诊' AND suggested_date<?");args.add(java.sql.Date.valueOf(date.minusDays(3)));}sql.append(" ORDER BY followup_plan_id LIMIT ?");args.add(limit+1);

@@ -15,7 +15,9 @@ class BookingApi {
     @GetMapping("/clinics") Object clinics(@RequestHeader(value="Authorization",required=false) String h) {
         var a=identity.require(h);
         if(!a.kind().equals("员工"))throw ApiError.denied();
-        return Store.json(db.jdbc.queryForList("SELECT c.clinic_id,c.clinic_code,c.name FROM clinics c WHERE c.active=1"));
+        if(a.readOnly())return VisitorWorkspace.clinics();
+        return Store.json(db.jdbc.queryForList("SELECT c.clinic_id,c.clinic_code,c.name FROM clinics c WHERE c.active=1 ORDER BY c.clinic_id")
+            .stream().filter(c->a.clinicVisible(Store.number(c,"clinic_id"))).toList());
     }
     @GetMapping("/dentists") Object dentists(@RequestHeader(value="Authorization",required=false) String h,@RequestParam String clinicId) {
         front(h,clinicId);
@@ -27,8 +29,14 @@ class BookingApi {
     }
     @GetMapping("/staff/patients") Object patients(@RequestHeader(value="Authorization",required=false) String h,@RequestParam String clinicId,@RequestParam String q) {
         var a=front(h,clinicId); Store.required(q,80);
-        var result=Store.json(db.jdbc.queryForList("SELECT * FROM patients WHERE patient_no=? OR name=? OR phone=? ORDER BY patient_id LIMIT 50",q,q,q));
-        db.audit(a.id(),"读取","patient_search",Store.parseId(clinicId)); return result;
+        long clinic=Store.parseId(clinicId);
+        var result=Store.json(db.jdbc.queryForList("""
+            SELECT p.patient_id,p.patient_no,p.name,p.birth_date,p.billing_address,p.phone,p.email,
+                   p.emergency_name,p.emergency_phone,p.allergy_declaration,p.allergy_version,p.row_version,p.active
+            FROM patients p WHERE (p.patient_no=? OR p.name=? OR p.phone=?)
+            AND
+            """+BookingService.PATIENT_AT_CLINIC+" ORDER BY p.patient_id LIMIT 50",q,q,q,clinic,Long.toString(clinic)));
+        db.audit(a.id(),"读取","patient_search",clinic); return result;
     }
     @PostMapping("/staff/patients") Object createPatient(@RequestHeader(value="Authorization",required=false) String h,@RequestBody BookingService.Patient p) { return service.patient(identity.require(h),p); }
     @PostMapping("/staff/appointments") Object create(@RequestHeader(value="Authorization",required=false) String h,@RequestBody BookingService.Booking b) { return service.create(identity.require(h),b); }

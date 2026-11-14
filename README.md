@@ -6,14 +6,17 @@
 
 ### 网页管理后台
 
-| 项目 | 访问方式 |
-| --- | --- |
-| 登录入口 | [和安口腔管理后台](https://dental.know11know.top/) |
-| 管理员账号 | `dental_admin` |
-| 管理员密码 | &#69;&#76;&#70;&#102;&#117;&#100;&#56;&#85;&#110;&#69;&#76;&#56;&#107;&#88;&#113;&#121;&#86;&#87;&#80;&#79;&#85;&#48;&#76;&#82;&#122;&#119;&#77; |
-| 服务端 API | [门店目录接口示例](https://api.know11know.top/api/v1/catalog/clinics) |
+[打开和安口腔管理后台](https://dental.know11know.top/)
 
-登录后可查看工作台、排班、预约、接诊与治疗、结算、复诊和经营统计。办理流程时请使用虚构演示资料。
+| 角色 | 账号 | 密码 | 登录后可查看或办理 |
+| --- | --- | --- | --- |
+| 总部管理员 | `dental_admin` | `ELFfud8UnEL8kXqyVWPOU0LRzwM` | 全门店工作台、账号管理 |
+| 店长 | `fixture_manager` | `Hn!v_TJh36Xgwl5_iG_fKyn` | 天河店排班、调班停诊和提醒 |
+| 前台 | `fixture_front` | `Hn!5mRdkbijX4_at4yeYKwf` | 天河店预约、到诊和结算 |
+| 牙医 | `dental_dentist` | `GdC3uks_kJGa80X9mqhCfrwU5_c` | 本人接诊和复诊 |
+| 财务 | `fixture_finance` | `Hn!GjlkePBFnhSQp9unS4e2` | 天河店费用和经营报表 |
+
+这些账号供课程验收使用，办理流程时请使用虚构资料。[角色权限说明](STAFF-ROLES.md) · [门店目录接口示例](https://api.know11know.top/api/v1/catalog/clinics)
 
 ### 微信小程序「牙牙课程演示」
 

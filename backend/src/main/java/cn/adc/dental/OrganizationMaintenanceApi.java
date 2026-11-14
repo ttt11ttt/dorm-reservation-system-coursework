@@ -62,10 +62,11 @@ class OrganizationMaintenanceApi {
     @PostMapping("/openings/{id}/stop")
     @Transactional
     Object openingStop(@RequestHeader(value="Authorization",required=false) String h,@PathVariable String id,@RequestBody OpeningStop request){
-        var actor=staff(h);
+        var actor=identity.require(h);
         long opening=Store.parseId(id);
         String reason=label(request.reason(),500);
         var parent=db.one("SELECT clinic_id FROM clinic_openings WHERE opening_id=?",opening);
+        OrganizationRules.clinicRead(actor,Store.number(parent,"clinic_id"));
         lock("clinics","clinic_id",Store.number(parent,"clinic_id"));
         var before=lock("clinic_openings","opening_id",opening);
         if(!"有效".equals(before.get("status"))||!OpeningRules.time(before.get("updated_at")).equals(request.expectedUpdatedAt())){

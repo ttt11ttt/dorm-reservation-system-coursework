@@ -13,7 +13,8 @@ export function clearOrganizationPrivateDetail(detailRef) {
 export function organizationReadAccess(identity) {
   const grants = identity?.kind === '员工' && Array.isArray(identity.grants) ? identity.grants : []
   const operational = grants.filter((grant) => grant.role_code === '运营人员／店长')
-  const chain = operational.some(isChainScopeGrant)
+  const chain = operational.some(isChainScopeGrant) ||
+    grants.some(grant => grant.role_code === '总部管理' && isChainScopeGrant(grant))
   const clinicIds = [...new Set(operational.filter(isClinicScopeGrant).map((grant) => String(grant.clinic_id)))].sort((a, b) => BigInt(a) < BigInt(b) ? -1 : BigInt(a) > BigInt(b) ? 1 : 0)
   return { employee: identity?.kind === '员工', allowed: chain || clinicIds.length > 0, chain, clinicIds }
 }

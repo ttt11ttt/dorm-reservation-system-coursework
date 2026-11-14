@@ -11,8 +11,8 @@ final class OrganizationRules {
     static final int MAX_BYTES=48*1024;
     static void size(Object value){if(Store.encode(value).getBytes(StandardCharsets.UTF_8).length>MAX_BYTES)throw new ApiError(413,"ORG_PAYLOAD_TOO_LARGE","组织资源内容超出48KiB限制");}
     static void bound(int found,int max){if(found>max)throw new ApiError(413,"ORG_SCOPE_TOO_LARGE","组织治理范围超出单次限制");}
-    static boolean chain(Identity.Actor actor){return "员工".equals(actor.kind());}
-    static boolean local(Identity.Actor actor,long clinic){return "员工".equals(actor.kind())&&actor.grants().stream().anyMatch(g->"运营人员／店长".equals(g.get("role_code"))&&"门店".equals(g.get("scope_kind"))&&g.get("clinic_id") instanceof Number n&&n.longValue()==clinic);}
+    static boolean chain(Identity.Actor actor){return actor.chainRole("总部管理")||actor.chainRole("运营人员／店长");}
+    static boolean local(Identity.Actor actor,long clinic){return actor.hasRole("运营人员／店长",clinic);}
     static void chainOnly(Identity.Actor actor){if(!chain(actor))throw ApiError.denied();}
     static void clinicRead(Identity.Actor actor,long clinic){if(!chain(actor)&&!local(actor,clinic))throw ApiError.denied();}
     static void sameReceipt(long savedActor,String savedFingerprint,long actor,String requestedFingerprint){if(savedActor!=actor||!Objects.equals(savedFingerprint,requestedFingerprint))throw ApiError.conflict("IDEMPOTENCY_CONFLICT");}

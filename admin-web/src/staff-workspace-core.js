@@ -2,24 +2,31 @@ import { canOpenExpenseWorkspace, isValidGrantScope } from './expense-core.js'
 import { isChainScopeGrant, isClinicScopeGrant } from './expense-core.js'
 import { quarterReadAccess } from './quarter-core.js'
 
-export function staffWorkspaceAccess(identity) {
+export function staffWorkspaceAccess(identity, clinicId = '0') {
   const employee = identity?.kind === '员工'
-  const grants = employee && Array.isArray(identity.grants) ? identity.grants : []
+  const grants = employee && !identity.readOnly && Array.isArray(identity.grants)
+    ? identity.grants.filter((grant) => clinicId === '0' || isChainScopeGrant(grant)
+      || (isClinicScopeGrant(grant) && String(grant.clinic_id) === clinicId))
+    : []
+  const scopedIdentity = identity ? { ...identity, grants } : null
   const hasRole = (role) => grants.some((grant) => grant.role_code === role && isValidGrantScope(grant))
   const operations = grants.filter((grant) => grant.role_code === '运营人员／店长')
-  const organizationChain = operations.some(isChainScopeGrant)
+  const headquarters = grants.some((grant) => grant.role_code === '总部管理' && isChainScopeGrant(grant))
+  const organizationChain = headquarters || operations.some(isChainScopeGrant)
   const organizationClinicIds = [...new Set(operations.filter(isClinicScopeGrant).map((grant) => String(grant.clinic_id)))].sort((a, b) => BigInt(a) < BigInt(b) ? -1 : BigInt(a) > BigInt(b) ? 1 : 0)
-  const quarter = quarterReadAccess(identity)
+  const quarter = quarterReadAccess(scopedIdentity)
   return {
     employee,
     accountManager: hasRole('账号管理'),
+    headquarters,
+    audit: organizationChain,
     organization: organizationChain || organizationClinicIds.length > 0,
     organizationChain,
     organizationClinicIds,
     front: hasRole('前台'),
-    dentist: hasRole('牙医'),
+    dentist: Boolean(identity?.dentistId) && hasRole('牙医'),
     reminders: hasRole('前台') || hasRole('运营人员／店长'),
-    expenses: employee && canOpenExpenseWorkspace(identity),
+    expenses: employee && canOpenExpenseWorkspace(scopedIdentity),
     quarter: quarter.finance || quarter.headquarters,
   }
 }

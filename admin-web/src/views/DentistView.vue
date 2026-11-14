@@ -12,10 +12,10 @@ import { clinicalCompletionScope, hasRoleAtClinic, isCompletionResponseCurrent, 
 
 type Row = Record<string, unknown>
 type TreatmentDraft = { treatmentId: string; treatmentTypeId: string; units: string; unitPrice: string; performedAt: string; status: string; note: string }
-const props = defineProps<{ clinics: Clinic[]; identity: Identity }>()
+const props = defineProps<{ clinics: Clinic[]; identity: Identity; initialMode?: 'care' | 'followups' }>()
 const dentistClinics = computed(() => props.clinics.filter((item) => hasRoleAtClinic(props.identity, '牙医', item.clinic_id)))
 const clinicId = ref(dentistClinics.value[0]?.clinic_id ?? '')
-const workMode = ref<'care' | 'followups'>('care')
+const workMode = ref<'care' | 'followups'>(props.initialMode ?? 'care')
 const visits = ref<Row[]>([])
 const context = ref<Row | null>(null)
 const catalogue = ref<Row[]>([])

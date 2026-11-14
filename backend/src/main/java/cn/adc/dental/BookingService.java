@@ -51,6 +51,7 @@ class BookingService {
         for(long clinicId:resources.clinics()){var row=db.one("SELECT active FROM clinics WHERE clinic_id=? FOR UPDATE",clinicId);clinicActive.put(clinicId,Store.enabled(row,"active"));}
         for(long dentistId:resources.dentists()){var row=db.one("SELECT active FROM dentists WHERE dentist_id=? FOR UPDATE",dentistId);dentistActive.put(dentistId,Store.enabled(row,"active"));}
         var p=db.one("SELECT active,phone FROM patients WHERE patient_id=? FOR UPDATE",patient);
+        if(!self&&planCandidate==null)requirePatientAtClinic(db,patient,clinic);
         boolean enabled=Boolean.TRUE.equals(clinicActive.get(clinic))&&Boolean.TRUE.equals(dentistActive.get(dentist));
         boolean planActive=planCandidate!=null&&Boolean.TRUE.equals(clinicActive.get(planCandidate.owner().clinic()))&&Boolean.TRUE.equals(dentistActive.get(planCandidate.owner().dentist()))&&Store.enabled(p,"active");
         var coverage=rules.lockCoverage(schedule,clinic,dentist);
@@ -80,12 +81,27 @@ class BookingService {
         return lifecycle.attach(result(id,false,planId!=null),outcome);
     }
     private boolean enabled(Map<String,Object> row) { return Boolean.TRUE.equals(row.get("active")) || row.get("active") instanceof Number n && n.intValue()==1; }
+    static final String PATIENT_AT_CLINIC = """
+        (EXISTS(SELECT 1 FROM appointments a WHERE a.patient_id=p.patient_id AND a.clinic_id=?)
+         OR EXISTS(SELECT 1 FROM audit_logs l WHERE l.object_type='patient' AND l.action='门店建档'
+           AND l.object_id=CAST(p.patient_id AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_0900_as_cs
+           AND l.reason=?))
+        """;
+
+    static void requirePatientAtClinic(Store db,long patient,long clinic){
+        var allowed=db.jdbc.queryForObject(
+            "SELECT EXISTS(SELECT 1 FROM patients p WHERE p.patient_id=? AND "+PATIENT_AT_CLINIC+")",
+            Boolean.class,patient,clinic,Long.toString(clinic));
+        if(!Boolean.TRUE.equals(allowed))throw ApiError.denied();
+    }
+
     private long number(Map<String,Object> row,String column) { return ((Number)row.get(column)).longValue(); }
     private boolean covered(Map<String,Object> row,Timestamp start,Timestamp end) { return "有效".equals(row.get("status")) && !((Timestamp)row.get("start_at")).after(start) && !((Timestamp)row.get("end_at")).before(end); }
     private Object result(long id,boolean replayed,boolean linked) { return Map.of("replayed",replayed,"appointment",Store.json(db.one("SELECT "+COLUMNS+(linked?",followup_plan_id":"")+" FROM appointments WHERE appointment_id=?",id))); }
     @Transactional
     public Object patient(Identity.Actor actor,Patient p) {
-        actor.front(Store.parseId(p.clinicId));
+        long clinic=Store.parseId(p.clinicId);
+        actor.front(clinic);
         Store.required(p.patientNo,32); Store.required(p.name,80); Store.required(p.billingAddress,255); Store.required(p.phone,32); Store.required(p.emergencyName,80); Store.required(p.emergencyPhone,32);
         if(p.email!=null && p.email.length()>254)throw ApiError.bad();
         java.time.LocalDate birth;
@@ -93,6 +109,7 @@ class BookingService {
         long id=db.id();
         db.jdbc.update("INSERT INTO patients(patient_id,patient_no,name,birth_date,billing_address,phone,email,emergency_name,emergency_phone,allergy_declaration,created_at) VALUES(?,?,?,?,?,?,?,?,?,'未询问',?)",id,p.patientNo,p.name,java.sql.Date.valueOf(birth),p.billingAddress,p.phone,p.email,p.emergencyName,p.emergencyPhone,db.now());
         db.audit(actor.id(),"创建","patient",id);
+        db.audit(actor.id(),"门店建档","patient",id,Long.toString(clinic),null,null);
         return Store.json(db.one("SELECT * FROM patients WHERE patient_id=?",id));
     }
 }

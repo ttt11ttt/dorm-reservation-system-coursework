@@ -22,13 +22,13 @@ class BusinessAuditApi {
         // Explicit allowlist of business objects. Account and identity records use separate flows.
         switch(type){
             case "org_schedule", "org_opening", "org_clinic" -> {}
-            case "appointment" -> actor.front(clinic("SELECT clinic_id FROM appointments WHERE appointment_id=?",id));
-            case "guest_reservation" -> actor.front(clinic("SELECT clinic_id FROM guest_reservations WHERE guest_reservation_id=?",id));
-            case "treatment" -> actor.front(clinic("""
+            case "appointment" -> authorizeAudit(actor,clinic("SELECT clinic_id FROM appointments WHERE appointment_id=?",id));
+            case "guest_reservation" -> authorizeAudit(actor,clinic("SELECT clinic_id FROM guest_reservations WHERE guest_reservation_id=?",id));
+            case "treatment" -> authorizeAudit(actor,clinic("""
                 SELECT a.clinic_id FROM appointments a JOIN treatments t ON t.appointment_id=a.appointment_id
                 WHERE t.treatment_id=?
                 """,id));
-            case "invoice" -> actor.front(clinic("""
+            case "invoice" -> authorizeAudit(actor,clinic("""
                 SELECT a.clinic_id FROM appointments a JOIN invoices i ON i.appointment_id=a.appointment_id
                 WHERE i.invoice_id=?
                 """,id));
@@ -48,5 +48,9 @@ class BusinessAuditApi {
 
     private long clinic(String sql,long id){
         return Store.number(db.one(sql,id),"clinic_id");
+    }
+
+    private void authorizeAudit(Identity.Actor actor,long clinic){
+        if(!actor.chainRole("总部管理"))actor.front(clinic);
     }
 }

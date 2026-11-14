@@ -1,0 +1,220 @@
+.approved-shell.staff-edition {
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+}
+
+.staff-edition .workspace {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.approved-shell.staff-edition .side {
+  width: 100%;
+  height: 100dvh;
+  padding-inline: 12px;
+}
+
+.staff-edition .side .nav {
+  display: grid;
+  overflow: visible;
+}
+
+.approved-shell.staff-edition .navitem {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: center;
+  min-height: 42px;
+  gap: 10px;
+  padding: 8px 12px;
+  line-height: 1.35;
+}
+
+.staff-edition :is(.navicon, .stat-ico, .iconbtn, .mark) > svg {
+  display: block;
+}
+
+.approved-shell.staff-edition .navicon {
+  width: 24px;
+  height: 24px;
+  color: inherit;
+}
+
+.staff-edition .nav-text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.staff-edition .me .avatar,
+.staff-edition .top .iconbtn,
+.staff-edition .scope i {
+  flex-shrink: 0;
+}
+
+.approved-shell.staff-edition .top {
+  min-height: 64px;
+  height: auto;
+  padding-block: 10px;
+}
+
+.approved-shell.staff-edition .topright {
+  width: auto;
+  min-width: 0;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.staff-edition .topright .scope {
+  flex-direction: row;
+  max-width: 100%;
+}
+
+.staff-edition .topright .scope select {
+  min-height: 0;
+  max-width: min(240px, 45vw);
+}
+
+.staff-edition .topright .scope:focus-within {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.staff-edition .topright .today {
+  white-space: nowrap;
+}
+
+.staff-edition .schedule-change {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.staff-edition .schedule-change-table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.staff-edition .schedule-change-table table {
+  min-width: 360px;
+}
+
+.staff-edition .stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.staff-edition .stat .number {
+  margin-bottom: 12px;
+}
+
+.approved-shell.staff-edition .stat .statfooter {
+  align-self: stretch;
+  margin-top: auto;
+}
+
+@media (max-width: 900px) {
+  .approved-shell.staff-edition {
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .approved-shell.staff-edition .side {
+    padding-inline: 8px;
+  }
+
+  .approved-shell.staff-edition .side .brand {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .approved-shell.staff-edition .navitem {
+    grid-template-columns: 24px;
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  .staff-edition .nav-text,
+  .approved-shell.staff-edition .me,
+  .approved-shell.staff-edition .topright .today {
+    display: none;
+  }
+
+  .approved-shell.staff-edition .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .approved-shell.staff-edition .top {
+    padding-inline: 12px;
+  }
+
+  .staff-edition .crumb {
+    display: none;
+  }
+
+  .approved-shell.staff-edition .dashboard-banner {
+    flex-wrap: wrap;
+  }
+
+  .staff-edition .page-heading:has(> .date-range) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .staff-edition .date-range {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: stretch;
+  }
+
+  .staff-edition .date-range label,
+  .staff-edition .date-range label input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .staff-edition .date-range .button {
+    grid-column: 1 / -1;
+  }
+
+  .staff-edition :is(.fulfillment-dialog, .followup-dialog) {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+
+  .staff-edition :is(.fulfillment-dialog-body, .followup-dialog-body) {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .staff-edition :is(.fulfillment-dialog-footer, .followup-dialog-footer) {
+    flex-shrink: 0;
+  }
+
+  .staff-edition .schedule-workbench,
+  .staff-edition .schedule-board,
+  .staff-edition .schedule-workbench .opening-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .staff-edition .schedule-workbench .opening-select select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .staff-edition .schedule-workbench :is(.board-hours, .lane-row) {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .staff-edition .schedule-workbench .lane-doc {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 430px) {
+  .approved-shell.staff-edition .stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

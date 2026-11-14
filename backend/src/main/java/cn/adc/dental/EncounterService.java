@@ -77,7 +77,7 @@ class EncounterService {
         actor.dentist(clinic,Objects.requireNonNullElse(actor.dentistId(),-1L));
         Timestamp start=Store.offset(from),end=Store.offset(to);
         if(!end.after(start)||Duration.between(start.toInstant(),end.toInstant()).compareTo(Duration.ofDays(31))>0)throw ApiError.bad();
-        var rows=db.jdbc.queryForList("SELECT a.appointment_id,a.appointment_no,a.patient_id,a.clinic_id,a.dentist_id,a.schedule_id,a.scheduled_start,a.scheduled_end,a.booking_channel,a.requested_treatments,a.special_needs,a.appointment_status,a.treatment_status,a.row_version,p.patient_no,p.name AS patient_name,a.arrived_at,a.completed_at FROM appointments a JOIN patients p ON p.patient_id=a.patient_id WHERE a.clinic_id=? AND a.scheduled_start>=? AND a.scheduled_start<? ORDER BY a.scheduled_start LIMIT 100",clinic,start,end);
+        var rows=db.jdbc.queryForList("SELECT a.appointment_id,a.appointment_no,a.patient_id,a.clinic_id,a.dentist_id,a.schedule_id,a.scheduled_start,a.scheduled_end,a.booking_channel,a.requested_treatments,a.special_needs,a.appointment_status,a.treatment_status,a.row_version,p.patient_no,p.name AS patient_name,a.arrived_at,a.completed_at FROM appointments a JOIN patients p ON p.patient_id=a.patient_id WHERE a.clinic_id=? AND a.dentist_id=? AND a.scheduled_start>=? AND a.scheduled_start<? ORDER BY a.scheduled_start LIMIT 100",clinic,actor.dentistId(),start,end);
         db.audit(actor.id(),"读取","dentist_worklist",clinic);return Store.json(rows);
     }
     Object catalogue(Identity.Actor actor,long clinic) {

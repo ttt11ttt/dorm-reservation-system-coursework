@@ -10,7 +10,7 @@ const DENTIST_RECEIPT_FIELDS = ['dentistId', 'employeeNo', 'name', 'active', 'mu
 
 export function organizationCreateAccess(identity) {
   const grants = identity?.kind === '员工' && Array.isArray(identity.grants) ? identity.grants : []
-  const canCreate = grants.some((grant) => grant?.role_code === '运营人员／店长'
+  const canCreate = grants.some((grant) => ['运营人员／店长', '总部管理'].includes(grant?.role_code)
     && isChainScopeGrant(grant))
   return { employee: identity?.kind === '员工', canCreate }
 }

@@ -40,7 +40,7 @@ final class StaffAdminRules {
     static void grant(String kind,List<Map<String,Object>> actorGrants,long actor,long target,String role,String scope,Long clinic,Long dentist){
         authorize(kind,actorGrants,clinic);
         if(actor==target)throw ApiError.denied();
-        if(scope.equals("连锁")&&!chain(actorGrants))throw ApiError.denied();
+        if((scope.equals("连锁")||role.equals("账号管理"))&&!chain(actorGrants))throw ApiError.denied();
         if(role.equals("牙医")&&dentist==null)throw ApiError.conflict("DENTIST_BINDING_REQUIRED");
     }
     static List<Map<String,Object>> visible(List<Map<String,Object>> grants,Long clinic,boolean chain){

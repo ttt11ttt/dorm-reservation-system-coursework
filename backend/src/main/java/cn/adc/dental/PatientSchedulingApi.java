@@ -23,6 +23,11 @@ class PatientSchedulingApi {
     private Identity.Actor patient(String h) { var a=identity.require(h);a.patient();return a; }
     @GetMapping("/patient/profile") Object profile(@RequestHeader(value="Authorization",required=false) String h) { return info.read(patient(h),true); }
     @PutMapping("/patient/profile/contact") Object contact(@RequestHeader(value="Authorization",required=false) String h,@RequestBody PatientInformation.Contact request) { return info.contact(patient(h),request); }
+    @PutMapping("/staff/patients/{id}/contact")
+    Object staffContact(@RequestHeader(value="Authorization",required=false) String h,@PathVariable String id,
+                        @RequestParam String clinicId,@RequestBody PatientInformation.Contact request) {
+        return info.staffContact(identity.require(h),Store.parseId(id),Store.parseId(clinicId),request);
+    }
     @PutMapping("/patient/profile/allergies") Object allergies(@RequestHeader(value="Authorization",required=false) String h,@RequestBody PatientInformation.AllergyDeclaration request) { return info.allergies(patient(h),request); }
     @GetMapping("/patient/booking-status") Object status(@RequestHeader(value="Authorization",required=false) String h) { return info.read(patient(h),false); }
     @GetMapping("/patient/clinics") Object clinics(@RequestHeader(value="Authorization",required=false) String h) { patient(h);return Store.json(db.jdbc.queryForList("SELECT clinic_id,clinic_code,name,postal_address,phone FROM clinics WHERE active=1 ORDER BY clinic_id")); }
@@ -76,8 +81,16 @@ class PatientInformation {
     @Transactional
     public Object contact(Identity.Actor actor,Contact request){
         actor.patient();
-        long id=actor.patientId();
+        return saveContact(actor,actor.patientId(),null,request);
+    }
+    @Transactional
+    public Object staffContact(Identity.Actor actor,long id,long clinic,Contact request){
+        actor.front(clinic);
+        return saveContact(actor,id,clinic,request);
+    }
+    private Object saveContact(Identity.Actor actor,long id,Long clinic,Contact request){
         var before=patientRow(id,true);
+        if(clinic!=null)BookingService.requirePatientAtClinic(db,id,clinic);
         version(before,request.expectedVersion());
         String phone=OrganizationRules.label(request.phone(),32);
         String email=request.email()==null||request.email().isBlank()?null:OrganizationRules.label(request.email(),254);
@@ -89,8 +102,16 @@ class PatientInformation {
             WHERE patient_id=?
             """,phone,email,address,emergency,emergencyPhone,id);
         var after=patientRow(id,false);
-        db.audit(actor.id(),"本人修改联系资料","patient",id,null,before,after);
-        return Store.json(after);
+        if(clinic==null){
+            db.audit(actor.id(),"本人修改联系资料","patient",id,null,before,after);
+            return Store.json(after);
+        }
+        var fields=List.of("patient_id","row_version","phone","email","billing_address","emergency_name","emergency_phone");
+        var oldContact=new java.util.LinkedHashMap<String,Object>();
+        var newContact=new java.util.LinkedHashMap<String,Object>();
+        for(String field:fields){oldContact.put(field,before.get(field));newContact.put(field,after.get(field));}
+        db.audit(actor.id(),"前台修改联系资料","patient",id,Long.toString(clinic),oldContact,newContact);
+        return Store.json(newContact);
     }
     @Transactional
     public Object allergies(Identity.Actor actor,AllergyDeclaration request){

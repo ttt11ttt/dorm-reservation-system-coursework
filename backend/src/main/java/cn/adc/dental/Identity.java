@@ -21,12 +21,14 @@ class Identity {
         void front(long clinic) { role("前台",clinic); }
         void dentist(long clinic,long responsibleDentist) {
             role("牙医",clinic);
-            // Unified staff workspace: the appointment retains its actual dentist.
+            if(dentistId==null || dentistId.longValue()!=responsibleDentist)throw ApiError.denied();
         }
         void role(String role,long clinic) {
             if(!hasRole(role,clinic))throw ApiError.denied();
         }
-        boolean hasRole(String role,long clinic) { return kind.equals("员工") && grants.stream().anyMatch(g->role.equals(g.get("role_code")) && ("连锁".equals(g.get("scope_kind")) || g.get("clinic_id") instanceof Number n && n.longValue()==clinic)); }
+        boolean hasRole(String role,long clinic) { return kind.equals("员工") && !readOnly() && grants.stream().anyMatch(g->role.equals(g.get("role_code")) && ("连锁".equals(g.get("scope_kind")) || "门店".equals(g.get("scope_kind")) && g.get("clinic_id") instanceof Number n && n.longValue()==clinic)); }
+        boolean chainRole(String role) { return hasRole(role,0); }
+        boolean clinicVisible(long clinic) { return grants.stream().anyMatch(g->hasRole(String.valueOf(g.get("role_code")),clinic)); }
         void patient() { if(!kind.equals("患者") || patientId==null) throw ApiError.denied(); }
     }
     private final Store db;
@@ -52,7 +54,7 @@ class Identity {
         var rows=db.jdbc.queryForList("SELECT account_id,credential_ref FROM accounts WHERE login_name=? AND account_kind=? AND active=1 FOR SHARE",name,kind);
         if(rows.size()!=1 || !verify(password,rows.getFirst().get("credential_ref").toString()))throw new ApiError(401,"INVALID_CREDENTIALS","账号或密码无效");
         long id=((Number)rows.getFirst().get("account_id")).longValue();
-        var actor=load(id); if(kind.equals("员工") && actor.grants.isEmpty() && !"访客".equals(actor.kind()))throw ApiError.denied();
+        var actor=load(id); if(kind.equals("员工") && actor.grants.isEmpty())throw ApiError.denied();
         var version=IdentitySessionRules.version(rows.getFirst().get("credential_ref").toString(),stateGeneration(id));
         byte[] bytes=new byte[32]; db.random.nextBytes(bytes);
         String token=Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
@@ -84,6 +86,7 @@ class Identity {
         if(session==null || !session.expires.isAfter(db.clock.instant())) { sessions.remove(key); throw unauthenticated(); }
         try {
             var actor=load(session.accountId);
+            if("员工".equals(actor.kind()) && actor.grants().isEmpty())throw unauthenticated();
             var credential=db.jdbc.queryForList("SELECT credential_ref FROM accounts WHERE account_id=? AND active=1",session.accountId);
             if(credential.size()!=1 || !IdentitySessionRules.matches(session.version,IdentitySessionRules.version(credential.getFirst().get("credential_ref").toString(),stateGeneration(session.accountId)))
                 || actor.readOnly()!=session.readOnly() || !Objects.equals(actor.kind(),session.kind) || !Objects.equals(actor.patientId(),session.patientId) || !Objects.equals(actor.dentistId(),session.dentistId))throw unauthenticated();
@@ -107,13 +110,18 @@ class Identity {
         var a=rows.getFirst(); Long patient=(Long)a.get("patient_id"),dentist=(Long)a.get("dentist_id");
         if(patient!=null && db.jdbc.queryForObject("SELECT COUNT(*) FROM patients WHERE patient_id=? AND active=1",Integer.class,patient)!=1)throw unauthenticated();
         if(dentist!=null && db.jdbc.queryForObject("SELECT COUNT(*) FROM dentists WHERE dentist_id=? AND active=1",Integer.class,dentist)!=1)throw unauthenticated();
-        var grants=new ArrayList<Map<String,Object>>();
+        List<Map<String,Object>> grants=List.of();
         if("员工".equals(a.get("account_kind"))) {
-            var assigned=db.jdbc.queryForList("SELECT grant_id FROM account_grants WHERE account_id=? AND active=1 LIMIT 1",id);
-            // Zero stored grants permits business reads only; the gate rejects mutations.
-            if(assigned.isEmpty())grants.add(chainGrant("只读访客"));
-            for(String role:List.of("账号管理","运营人员／店长","总部管理","财务"))grants.add(chainGrant(role));
-            for(var clinic:db.jdbc.queryForList("SELECT clinic_id FROM clinics WHERE active=1"))for(String role:List.of("前台","牙医"))grants.add(Map.of("role_code",role,"scope_kind","门店","clinic_id",clinic.get("clinic_id")));
+            grants=db.jdbc.queryForList("""
+                SELECT g.role_code,g.scope_kind,g.clinic_id
+                FROM account_grants g
+                LEFT JOIN clinics c ON c.clinic_id=g.clinic_id
+                WHERE g.account_id=? AND g.active=1
+                  AND (g.scope_kind='连锁' OR c.active=1)
+                ORDER BY g.grant_id
+                """,id);
+            if(grants.stream().anyMatch(g->"只读访客".equals(g.get("role_code"))))grants=List.of(chainGrant("只读访客"));
+            else if(dentist==null)grants=grants.stream().filter(g->!"牙医".equals(g.get("role_code"))).toList();
         }
         return new Actor(id,a.get("account_kind").toString(),patient,dentist,grants);
     }

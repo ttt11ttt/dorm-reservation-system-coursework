@@ -7,7 +7,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/** Read-only staff visitors can inspect business data but cannot mutate it. */
+/** Staff visitors may use only the isolated teaching workspace and session endpoints. */
 @Configuration
 class VisitorAccessGate implements HandlerInterceptor, WebMvcConfigurer {
     private final Identity identity;
@@ -23,7 +23,11 @@ class VisitorAccessGate implements HandlerInterceptor, WebMvcConfigurer {
         var actor=identity.require(header);
         boolean read=java.util.Set.of("GET","HEAD","OPTIONS").contains(request.getMethod());
         boolean logout=request.getRequestURI().equals("/api/v1/sessions/current")&&request.getMethod().equals("DELETE");
-        if(actor.readOnly()&&!read&&!logout)throw new ApiError(403,"READ_ONLY","访客账号仅可查看，不能新增、修改或删除数据");
+        if(!actor.readOnly())return true;
+        if(!read&&!logout)throw new ApiError(403,"READ_ONLY","访客账号仅可查看，不能新增、修改或删除数据");
+        String path=request.getRequestURI().substring(request.getContextPath().length());
+        if(!logout&&!java.util.Set.of("/api/v1/me","/api/v1/clinics","/api/v1/staff/workspace").contains(path))
+            throw ApiError.denied();
         return true;
     }
 }

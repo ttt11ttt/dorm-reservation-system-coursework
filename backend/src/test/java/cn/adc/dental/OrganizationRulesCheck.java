@@ -18,7 +18,7 @@ public class OrganizationRulesCheck {
         OrganizationRules.clinicRead(local,10);check("local operations may read own clinic",true);
         reject("local operations cannot read other clinic","FORBIDDEN",()->OrganizationRules.clinicRead(local,11));
         reject("account admin cannot create organization","FORBIDDEN",()->OrganizationRules.chainOnly(actor("员工","账号管理","连锁",null)));
-        reject("headquarters cannot create organization","FORBIDDEN",()->OrganizationRules.chainOnly(actor("员工","总部管理","连锁",null)));
+        check("headquarters grant authorizes organization management",OrganizationRules.chain(actor("员工","总部管理","连锁",null)));
         reject("patient cannot use copied operations grant","FORBIDDEN",()->OrganizationRules.chainOnly(actor("患者","运营人员／店长","连锁",null)));
         check("area decimal canonicalizes without floating point",OrganizationRules.area("12").equals("12.00")&&OrganizationRules.area("12.5").equals("12.50"));
         reject("zero area denied","INVALID_INPUT",()->OrganizationRules.area("0"));

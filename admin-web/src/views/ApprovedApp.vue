@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed,onMounted,onUnmounted,ref } from 'vue'
+import { computed,onMounted,onUnmounted,ref,watch } from 'vue'
 import type { Directive } from 'vue'
 import { api,sessionToken,setSessionToken,setReadOnlySession } from '../api'
 import type { Clinic,Identity } from '../api'
@@ -24,7 +24,20 @@ const vReadonlyUi:Directive<HTMLElement,boolean|undefined>={
  unmounted(el){(el as HTMLElement&{readonlyObserver?:MutationObserver}).readonlyObserver?.disconnect()}
 }
 const identity=ref<Identity|null>(null),clinics=ref<Clinic[]>([]),page=ref('dashboard'),clinicId=ref('0'),loading=ref(true),loginError=ref(''),settingsTab=ref('accounts')
-const access=computed(()=>staffWorkspaceAccess(identity.value)),lane=createIdentityRefreshLane();let generation=0
+const access = computed(() => staffWorkspaceAccess(identity.value, clinicId.value))
+const allAccess = computed(() => staffWorkspaceAccess(identity.value))
+const lane = createIdentityRefreshLane()
+let generation = 0
+const staffEdition = computed(() => identity.value?.kind === '员工' && identity.value.readOnly === false)
+const dentistWorkspace = computed(() => staffEdition.value && Boolean(identity.value?.dentistId) && access.value.dentist)
+const staffLabel = computed(() => {
+  if (access.value.headquarters) return '总部工作台'
+  if (access.value.organization) return '店长工作台'
+  if (dentistWorkspace.value) return '牙医工作台'
+  if (access.value.front) return '前台工作台'
+  if (access.value.expenses || access.value.quarter) return '财务工作台'
+  return '账号管理工作台'
+})
 const allMenus=[['dashboard','工作台'],['scheduling','排班管理'],['appointments','预约管理'],['queue','患者队列'],['consultation','接诊与治疗'],['billing','就诊结算'],['followups','复诊跟进'],['dentists','牙医管理'],['patients','患者管理'],['projects','诊疗项目'],['applications','调班与停诊'],['clinics','门店信息'],['settings','账户设置']]
 // Linear stroke icons (18px) keep the navigation visually consistent.
 const icons:Record<string,string>={
@@ -42,7 +55,32 @@ const icons:Record<string,string>={
  clinics:'<svg viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.5l8.5 7V20a1.5 1.5 0 0 1-1.5 1.5h-4.5v-6.5h-5v6.5H5A1.5 1.5 0 0 1 3.5 20z"/></svg>',
  settings:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.2 14.4a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1 2 2 0 1 1-4 0 1.6 1.6 0 0 0-2.7-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7 2 2 0 1 1 0-4 1.6 1.6 0 0 0 1.1-2.7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 2.7-1.1 2 2 0 1 1 4 0 1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7 2 2 0 1 1 0 4 1.6 1.6 0 0 0-1.5 1z"/></svg>'
 }
-function allowed(p:string){if(['appointments','queue','billing','patients'].includes(p))return access.value.front;if(p==='consultation'||p==='followups')return access.value.front||access.value.dentist;if(['scheduling','dentists','applications','clinics'].includes(p))return access.value.organization;return true}
+const settings = computed(() => [
+  { key: 'accounts', label: '账号与权限', allowed: access.value.accountManager },
+  { key: 'reminders', label: '提醒配置', allowed: access.value.reminders },
+  { key: 'expenses', label: '费用登记', allowed: access.value.expenses },
+  { key: 'quarter', label: '季度经营', allowed: access.value.quarter },
+  { key: 'wechat', label: '患者微信核验', allowed: access.value.accountManager },
+  { key: 'audit', label: '业务操作记录', allowed: access.value.audit },
+].filter(tab => tab.allowed))
+function allowed(page: string) {
+  const a = access.value
+  if (identity.value?.readOnly) return ['dashboard', 'queue', 'patients', 'projects'].includes(page)
+  if (['dashboard', 'queue'].includes(page)) return a.organization || a.front
+  if (['appointments', 'billing', 'patients'].includes(page)) return a.front
+  if (page === 'consultation') return a.dentist
+  if (page === 'followups') return a.dentist || a.front
+  if (['scheduling', 'applications', 'clinics'].includes(page)) return a.organization
+  if (page === 'dentists') return a.organizationChain
+  if (page === 'projects') return a.organization || a.front || a.dentist
+  return page === 'settings' && settings.value.length > 0
+}
+function landing() {
+  if (allowed('dashboard') && (identity.value?.readOnly || access.value.organization)) return 'dashboard'
+  if (allowed('consultation')) return 'consultation'
+  if (allowed('appointments')) return 'appointments'
+  return allowed('settings') ? 'settings' : 'unavailable'
+}
 const menus=computed(()=>allMenus.filter(m=>allowed(m[0]!))),title=computed(()=>allMenus.find(m=>m[0]===page.value)?.[1]||'工作台')
 const navGroups=computed(()=>[
   {name:'日常接诊',keys:['dashboard','appointments','queue','consultation','billing','followups']},
@@ -50,10 +88,35 @@ const navGroups=computed(()=>[
   {name:'系统',keys:['settings']},
 ].map(group=>({...group,items:group.keys.flatMap(key=>menus.value.filter(item=>item[0]===key))})).filter(group=>group.items.length))
 const selectedClinics=computed(()=>clinicId.value==='0'?clinics.value:clinics.value.filter(c=>c.clinic_id===clinicId.value))
+const firstOperationsClinic = computed(() => selectedClinics.value.find(c => staffWorkspaceAccess(identity.value, c.clinic_id).organization)?.clinic_id)
 const scopeKey=computed(()=>JSON.stringify([identity.value?.accountId,identity.value?.grants,clinicId.value]))
 const dateLabel=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'long',day:'numeric',weekday:'long'}).format(new Date())
 function navigate(p:string){if(allowed(p)){page.value=p;window.scrollTo(0,0)}}
-async function loadIdentity(){const token=sessionToken();if(!token)return;const current=lane.begin(token);const me=await api<Identity>('/me');if(!lane.isCurrent(current,sessionToken()))return;setReadOnlySession(me.readOnly===true);const list=await api<Clinic[]>('/clinics');if(!lane.isCurrent(current,sessionToken()))return;identity.value=me;clinics.value=list;page.value='dashboard';clinicId.value='0'}
+watch([access, settings], () => {
+  if (!allowed(page.value)) page.value = landing()
+  if (!settings.value.some(tab => tab.key === settingsTab.value)) settingsTab.value = settings.value[0]?.key ?? ''
+})
+async function loadIdentity() {
+  const token = sessionToken()
+  if (!token) return
+  const current = lane.begin(token)
+  const me = await api<Identity>('/me')
+  if (!lane.isCurrent(current, sessionToken())) return
+  setReadOnlySession(me.readOnly === true)
+  const list = await api<Clinic[]>('/clinics')
+  if (!lane.isCurrent(current, sessionToken())) return
+  identity.value = me
+  clinics.value = list
+  clinicId.value = allAccess.value.headquarters || me.readOnly ? '0' : list[0]?.clinic_id ?? '0'
+  if (clinicId.value !== '0') {
+    const preferred = list.find(c => staffWorkspaceAccess(me, c.clinic_id).organization)
+      ?? list.find(c => staffWorkspaceAccess(me, c.clinic_id).dentist)
+      ?? list.find(c => staffWorkspaceAccess(me, c.clinic_id).front)
+    if (preferred) clinicId.value = preferred.clinic_id
+  }
+  page.value = landing()
+  settingsTab.value = settings.value[0]?.key ?? ''
+}
 async function login(body:{loginName:string;password:string}){const attempt=++generation;loginError.value='';lane.invalidate();identity.value=null;setSessionToken(null);try{const result=await api<{token:string}>('/staff/sessions',{method:'POST',body,auth:false});if(attempt!==generation)return;setSessionToken(result.token);await loadIdentity()}catch(e){if(attempt!==generation)return;setSessionToken(null);identity.value=null;loginError.value=e instanceof Error?e.message:'登录失败'}}
 async function logout(){const token=sessionToken();generation++;lane.invalidate();identity.value=null;clinics.value=[];const end=token?api('/sessions/current',{method:'DELETE'}).catch(()=>undefined):Promise.resolve();setSessionToken(null);await end}
 function expired(){generation++;lane.invalidate();setSessionToken(null);identity.value=null;clinics.value=[];loginError.value='登录已失效，请重新登录。'}
@@ -62,18 +125,19 @@ onUnmounted(()=>window.removeEventListener('adc:session-expired',expired))
 </script>
 <template>
  <div v-if="loading" class="boot-screen">正在验证员工会话…</div><LoginView v-else-if="!identity" :error="loginError" @login="login" />
- <div v-else-if="identity.kind==='访客'" class="visitor-page"><section class="visitor-card"><span class="eyebrow">HEAN DENTAL</span><h1>访客登录成功</h1><p>当前账号没有业务访问权限。</p><p class="sub">患者资料、预约、排班、诊疗、结算和账户管理均不可访问。</p><button @click="logout">退出登录</button></section></div><div v-else v-readonly-ui="identity.readOnly" class="shell approved-shell" :class="{'read-only-workspace':identity.readOnly}">
-  <aside class="side"><div class="brand"><span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5c-3-3-8-2-8 2 0 3 2 5 3 11 .5 3 2 3 3-1l1-4c.3-1 1.7-1 2 0l1 4c1 4 2.5 4 3 1 1-6 3-8 3-11 0-4-5-5-8-2Z"/></svg></span><div><b>和安口腔</b><small>HEAN DENTAL</small></div></div><nav class="nav" aria-label="主导航"><div v-for="group in navGroups" :key="group.name" class="navgroup"><div class="cap">{{group.name}}</div><button v-for="m in group.items" :key="m[0]" class="navitem" :class="{on:page===m[0]}" :aria-current="page===m[0]?'page':undefined" @click="navigate(m[0]!)"><span class="navicon" aria-hidden="true" v-html="icons[m[0]]"></span>{{m[1]}}</button></div></nav><div class="sidefoot"><div class="sidenote"><b>课程演示环境</b><span>数据来自服务器真实读写，用于教学演示与验收。</span></div><div class="me"><span class="avatar">{{access.dentist?'医':'管'}}</span><div><b>{{identity.readOnly?'只读访客':'课程管理员'}}</b><small>牙科诊所管理</small></div><button class="logout" @click="logout">退出</button></div></div></aside>
-  <div class="workspace"><header class="top"><div class="crumb">和安口腔 / <b>{{title}}</b></div><div class="topright"><label class="scope"><i></i><select v-model="clinicId" aria-label="选择门店"><option value="0">全部门店</option><option v-for="c in clinics" :key="c.clinic_id" :value="c.clinic_id">{{c.name}}</option></select></label><span class="today">{{dateLabel}}</span><span class="badge">{{identity.readOnly?'只读访客 · 仅可查看':'牙科诊所管理后台'}}</span><button class="iconbtn" title="退出登录" @click="logout"><svg viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/></svg></button></div></header><main class="content"><div v-if="identity.readOnly" class="readonly-banner">只读访客：可以查看各项业务数据，不能新增、修改、删除或办理业务。</div>   <ApprovedWorkspace v-if="['dashboard','queue','billing','patients','projects'].includes(page)" :key="scopeKey+page" :identity="identity" :clinic-id="clinicId" :mode="page" @navigate="navigate" />
+ <div v-else-if="identity.kind==='访客'" class="visitor-page"><section class="visitor-card"><span class="eyebrow">HEAN DENTAL</span><h1>访客登录成功</h1><p>当前账号没有业务访问权限。</p><p class="sub">患者资料、预约、排班、诊疗、结算和账户管理均不可访问。</p><button @click="logout">退出登录</button></section></div><div v-else v-readonly-ui="identity.readOnly" class="shell approved-shell" :class="{'read-only-workspace':identity.readOnly,'staff-edition':staffEdition}">
+  <aside class="side"><div class="brand"><span class="mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5c-3-3-8-2-8 2 0 3 2 5 3 11 .5 3 2 3 3-1l1-4c.3-1 1.7-1 2 0l1 4c1 4 2.5 4 3 1 1-6 3-8 3-11 0-4-5-5-8-2Z"/></svg></span><div><b>和安口腔</b><small>HEAN DENTAL</small></div></div><nav class="nav" aria-label="主导航"><div v-for="group in navGroups" :key="group.name" class="navgroup"><div class="cap">{{group.name}}</div><button v-for="m in group.items" :key="m[0]" class="navitem" :class="{on:page===m[0]}" :aria-current="page===m[0]?'page':undefined" :aria-label="m[1]" :title="staffEdition ? m[1] : undefined" @click="navigate(m[0]!)"><span class="navicon" aria-hidden="true" v-html="icons[m[0]]"></span><span v-if="staffEdition" class="nav-text">{{m[1]}}</span><template v-else>{{m[1]}}</template></button></div></nav><div class="sidefoot"><div class="sidenote"><b>课程演示环境</b><span>数据来自服务器真实读写，用于教学演示与验收。</span></div><div class="me"><span class="avatar">{{(staffEdition ? identity.dentistId : access.dentist) ? '医' : '管'}}</span><div><b>{{staffEdition ? staffLabel : identity.readOnly ? '只读访客' : '课程管理员'}}</b><small>牙科诊所管理</small></div><button class="logout" @click="logout">退出</button></div></div></aside>
+  <div class="workspace"><header class="top"><div class="crumb">和安口腔 / <b>{{title}}</b></div><div class="topright"><label class="scope"><i></i><select v-model="clinicId" aria-label="选择门店"><option v-if="allAccess.headquarters || identity.readOnly || clinics.length > 1" value="0">{{ identity.readOnly || allAccess.headquarters ? "全部门店" : "已授权门店" }}</option><option v-for="c in clinics" :key="c.clinic_id" :value="c.clinic_id">{{c.name}}</option></select></label><span class="today">{{dateLabel}}</span><span class="badge">{{staffEdition ? staffLabel : identity.readOnly ? '只读访客 · 仅可查看' : '牙科诊所管理后台'}}</span><button class="iconbtn" aria-label="退出登录" title="退出登录" @click="logout"><svg viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/></svg></button></div></header><main class="content"><div v-if="identity.readOnly" class="readonly-banner">只读访客：可以查看各项业务数据，不能新增、修改、删除或办理业务。</div>   <ApprovedWorkspace v-if="['dashboard','queue','billing','patients','projects'].includes(page)" :key="scopeKey+page" :identity="identity" :clinic-id="clinicId" :mode="page" @navigate="navigate" />
    <div v-else class="approved-inner">
     <FrontDeskView v-if="page==='appointments'&&access.front" :key="scopeKey" :clinics="selectedClinics" :identity="identity" />
-    <OrganizationScheduleView :selected-clinic-id="clinicId==='0'?clinics[0]?.clinic_id:clinicId" v-else-if="page==='scheduling'&&access.organization" :key="scopeKey" :identity="identity" />
+    <OrganizationScheduleView :selected-clinic-id="firstOperationsClinic" v-else-if="page==='scheduling'&&access.organization" :key="scopeKey" :identity="identity" />
     <template v-else-if="page==='consultation'"><DentistView v-if="access.dentist" :key="scopeKey" :clinics="selectedClinics" :identity="identity" /><template v-else><div class="pagehead"><div><div class="eyebrow">CONSULTATION & TREATMENT</div><h1>接诊与实际治疗</h1><p class="sub">前台登记到诊，由接诊牙医复核过敏并确认实际治疗。</p></div></div><div class="care-warning">当前为前台／管理账号。实际治疗确认请使用对应牙医账号在同一后台办理。</div><ApprovedWorkspace :identity="identity" :clinic-id="clinicId" mode="queue" @navigate="navigate" /></template></template>
-    <FrontDeskFollowups v-else-if="page==='followups'&&access.front" :key="scopeKey" :clinics="selectedClinics" :identity="identity" />
-    <DentistView v-else-if="page==='followups'&&access.dentist" :key="scopeKey" :clinics="selectedClinics" :identity="identity" />
+    <FrontDeskFollowups v-else-if="page==='followups'&&access.front&&!dentistWorkspace" :key="scopeKey" :clinics="selectedClinics" :identity="identity" />
+    <DentistView v-else-if="page==='followups'&&access.dentist" :key="scopeKey" :clinics="selectedClinics" :identity="identity" :initial-mode="dentistWorkspace ? 'followups' : undefined" />
     <OrganizationView v-else-if="[ 'dentists', 'clinics' ].includes(page)&&access.organization" :key="scopeKey+page" :identity="identity" :initial-section="page==='dentists'?'dentists':'clinics'" />
-    <ScheduleChangeView v-else-if="page==='applications'&&access.organization" :clinic-id="clinicId==='0'?clinics[0]?.clinic_id||'':clinicId" :read-only="identity.readOnly" />
-    <template v-else-if="page==='settings'"><div class="pagehead"><div><div class="eyebrow">ACCOUNT & CLINIC SETTINGS</div><h1>账户设置</h1><p class="sub">按当前岗位维护账户与诊所配置。</p></div></div><div class="toolbar"><button v-if="access.accountManager" class="secondary" @click="settingsTab='accounts'">账号与权限</button><button v-if="access.reminders" class="secondary" @click="settingsTab='reminders'">提醒配置</button><button v-if="access.expenses" class="secondary" @click="settingsTab='expenses'">费用登记</button><button v-if="access.quarter" class="secondary" @click="settingsTab='quarter'">季度经营</button><button v-if="access.accountManager" class="secondary" @click="settingsTab='wechat'">患者微信核验</button><button class="secondary" @click="settingsTab='audit'">业务操作记录</button><button class="secondary" @click="logout">退出登录</button></div><AccountAdminView v-if="settingsTab==='accounts'&&access.accountManager" :identity="identity" :clinics="selectedClinics" @identity-refresh="loadIdentity" /><ReminderAdminView v-else-if="settingsTab==='reminders'&&access.reminders" :identity="identity" :clinics="selectedClinics" /><ExpenseAdminView v-else-if="settingsTab==='expenses'&&access.expenses" :identity="identity" :clinics="selectedClinics" /><QuarterReportView v-else-if="settingsTab==='quarter'&&access.quarter" :identity="identity" /><PatientWechatBindingView v-else-if="settingsTab==='wechat'&&access.accountManager" :identity="identity" /><BusinessAuditView v-else-if="settingsTab==='audit'" /></template>
+    <ScheduleChangeView v-else-if="page==='applications'&&access.organization" :clinic-id="firstOperationsClinic ?? ''" :read-only="identity.readOnly" />
+    <template v-else-if="page==='settings'"><div class="pagehead"><div><div class="eyebrow">ACCOUNT & CLINIC SETTINGS</div><h1>账户设置</h1><p class="sub">按当前岗位维护账户与诊所配置。</p></div></div><div class="toolbar"><button v-for="tab in settings" :key="tab.key" class="secondary" :aria-pressed="settingsTab===tab.key" @click="settingsTab=tab.key">{{ tab.label }}</button><button class="secondary" @click="logout">退出登录</button></div><AccountAdminView v-if="settingsTab==='accounts'&&access.accountManager" :identity="identity" :clinics="selectedClinics" @identity-refresh="loadIdentity" /><ReminderAdminView v-else-if="settingsTab==='reminders'&&access.reminders" :identity="identity" :clinics="selectedClinics" /><ExpenseAdminView v-else-if="settingsTab==='expenses'&&access.expenses" :identity="identity" :clinics="selectedClinics" /><QuarterReportView v-else-if="settingsTab==='quarter'&&access.quarter" :identity="identity" /><PatientWechatBindingView v-else-if="settingsTab==='wechat'&&access.accountManager" :identity="identity" /><BusinessAuditView v-else-if="settingsTab==='audit'&&access.audit" /></template>
+    <section v-else-if="page==='unavailable'" class="panel empty-state"><strong>当前门店没有可用页面</strong></section>
    </div><footer class="footer"><span>HEAN DENTAL © 2026　用心守护每一颗牙齿</span><span>课程演示 · 数据由服务器保存</span></footer>
   </main></div>
  </div>

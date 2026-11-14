@@ -27,6 +27,7 @@ const notice = ref('')
 const query = ref('')
 const patients = ref<Row[]>([])
 const selectedPatient = ref<Row | null>(null)
+const contactDraft = ref<{ expectedVersion: number; phone: string; email: string; billingAddress: string; emergencyName: string; emergencyPhone: string } | null>(null)
 const patientBusy = ref(false)
 const showNewPatient = ref(false)
 const showBooking = ref(false)
@@ -80,7 +81,7 @@ onUnmounted(() => { disposed = true; pageRevision += 1 })
 watch(authorizedClinics, (items) => { if (!items.some((item) => item.clinic_id === clinicId.value)) clinicId.value = items[0]?.clinic_id ?? '' })
 watch([clinicId, () => props.identity], async () => {
   pageRevision += 1
-  appointments.value = []; fulfillmentRow.value = null; query.value = ''; patients.value = []; selectedPatient.value = null
+  appointments.value = []; fulfillmentRow.value = null; query.value = ''; patients.value = []; selectedPatient.value = null; contactDraft.value = null
   guestReservations.value = []; guestListBusy.value = false; guestListError.value = ''; conversionTarget.value = null; conversionPatientId.value = ''; conversionEvidenceRef.value = ''
   guestCancelTarget.value = undefined; guestCancelReason.value = ''; guestCancelBusy.value = false
   conversionConfirmedInPerson.value = false; conversionPending.value = null; conversionBusy.value = false; conversionError.value = ''; conversionNotice.value = ''; conversionReceipt.value = null
@@ -149,6 +150,7 @@ async function searchPatients() {
   finally { if (isCurrent(scope)) patientBusy.value = false }
 }
 function choosePatient(patient: Row) {
+  contactDraft.value = null
   if (conversionTarget.value) {
     conversionPatientId.value = String(patient.patient_id)
     patients.value = []; query.value = ''; showNewPatient.value = false
@@ -156,6 +158,40 @@ function choosePatient(patient: Row) {
     return
   }
   selectedPatient.value = patient; showBooking.value = true; prepareBooking()
+}
+function startContactEdit() {
+  const patient = selectedPatient.value
+  if (!patient || props.identity.readOnly) return
+  contactDraft.value = {
+    expectedVersion: Number(patient.row_version),
+    phone: String(patient.phone ?? ''), email: String(patient.email ?? ''),
+    billingAddress: String(patient.billing_address ?? ''), emergencyName: String(patient.emergency_name ?? ''),
+    emergencyPhone: String(patient.emergency_phone ?? ''),
+  }
+}
+async function saveContact() {
+  const patient = selectedPatient.value
+  const draft = contactDraft.value
+  if (!patient || !draft || !hasClinicAccess() || patientBusy.value || props.identity.readOnly) return
+  const scope = captureScope()
+  patientBusy.value = true
+  error.value = ''
+  try {
+    const id = encodeURIComponent(String(patient.patient_id))
+    const result = await api<Row>(`/staff/patients/${id}/contact?clinicId=${encodeURIComponent(scope.clinic)}`, {
+      method: 'PUT', body: { ...draft, email: draft.email.trim() || null },
+    })
+    if (!isCurrent(scope) || selectedPatient.value !== patient) return
+    const updated = { ...patient, ...result }
+    selectedPatient.value = updated
+    patients.value = patients.value.map(row => row.patient_id === patient.patient_id ? updated : row)
+    contactDraft.value = null
+    notice.value = '联系资料已保存。'
+  } catch (e) {
+    if (isCurrent(scope)) error.value = message(e)
+  } finally {
+    if (isCurrent(scope)) patientBusy.value = false
+  }
 }
 async function createPatient() {
   if (!hasClinicAccess()) return
@@ -356,7 +392,12 @@ function closeGuestConversion() {
   conversionError.value = ''; conversionNotice.value = ''; query.value = ''; patients.value = []; showNewPatient.value = false
   patientForm.value = { patientNo: '', name: '', birthDate: '1990-01-01', billingAddress: '', phone: '', email: '', emergencyName: '', emergencyPhone: '' }
 }
-function closePatientForms() { showNewPatient.value = false; showBooking.value = false; selectedPatient.value = null }
+function closePatientForms() {
+  showNewPatient.value = false
+  showBooking.value = false
+  selectedPatient.value = null
+  contactDraft.value = null
+}
 </script>
 
 <template>
@@ -383,6 +424,18 @@ function closePatientForms() { showNewPatient.value = false; showBooking.value =
         <label>联系电话<input v-model="patientForm.phone" required maxlength="32" autocomplete="tel" /></label><label>电子邮箱（选填）<input v-model="patientForm.email" type="email" maxlength="254" /></label><label>通讯地址<input v-model="patientForm.billingAddress" required maxlength="255" /></label>
         <label>紧急联系人<input v-model="patientForm.emergencyName" required maxlength="80" /></label><label>紧急联系电话<input v-model="patientForm.emergencyPhone" required maxlength="32" /></label>
         <div class="form-actions"><button class="button button-primary" :disabled="patientBusy">{{ patientBusy ? '保存中…' : conversionTarget ? '独立建档并选择该患者' : '保存档案并继续预约' }}</button></div>
+      </form>
+      <button v-if="showBooking && selectedPatient && !contactDraft && !identity.readOnly" class="button button-quiet" type="button" @click="startContactEdit">修改联系资料</button>
+      <form v-if="showBooking && selectedPatient && contactDraft" class="form-grid form-grid-3 form-divider" @submit.prevent="saveContact">
+        <label>联系电话<input v-model="contactDraft.phone" required maxlength="32" /></label>
+        <label>电子邮箱<input v-model="contactDraft.email" type="email" maxlength="254" /></label>
+        <label>通讯地址<input v-model="contactDraft.billingAddress" required maxlength="255" /></label>
+        <label>紧急联系人<input v-model="contactDraft.emergencyName" required maxlength="80" /></label>
+        <label>紧急联系电话<input v-model="contactDraft.emergencyPhone" required maxlength="32" /></label>
+        <div class="form-actions">
+          <button type="button" class="button button-quiet" :disabled="patientBusy" @click="contactDraft=null">取消</button>
+          <button class="button button-primary" :disabled="patientBusy">保存联系资料</button>
+        </div>
       </form>
       <div v-if="showBooking" class="booking-box">
         <div class="booking-title"><div><span class="eyebrow">新预约 · {{ selectedPatient?.name }}</span><h3>选择真实出诊时段</h3></div><button class="icon-button" aria-label="关闭预约表单" @click="closePatientForms">×</button></div>

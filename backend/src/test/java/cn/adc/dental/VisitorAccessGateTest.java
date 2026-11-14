@@ -23,9 +23,13 @@ class VisitorAccessGateTest {
         when(identity.visitorSession("visitor-token")).thenReturn(true);
         when(identity.require("visitor-token")).thenReturn(new Identity.Actor(9,"员工",null,null,List.of(Map.of("role_code","只读访客","scope_kind","连锁"))));
         var gate=new VisitorAccessGate(identity);
-        for(String path:List.of("/api/v1/me","/api/v1/clinics","/api/v1/staff/workspace","/api/v1/staff/appointments")){
+        for(String path:List.of("/api/v1/me","/api/v1/clinics","/api/v1/staff/workspace")){
             var request=new MockHttpServletRequest("GET",path);request.addHeader("Authorization","visitor-token");
             assertTrue(gate.preHandle(request,new MockHttpServletResponse(),new Object()));
+        }
+        for(String path:List.of("/api/v1/staff/appointments","/api/v1/staff/patients","/api/v1/org/clinics","/api/v1/staff/workspace/statistics")){
+            var request=new MockHttpServletRequest("GET",path);request.addHeader("Authorization","visitor-token");
+            assertThrows(ApiError.class,()->gate.preHandle(request,new MockHttpServletResponse(),new Object()));
         }
     }
     @Test void readOnlyLogoutIsAllowed(){

@@ -87,13 +87,15 @@ onUnmounted(() => { generation++ })
     <p v-if="error" class="care-warning" role="alert">{{ error }}</p>
     <p v-if="message" role="status">{{ message }}</p>
     <p v-if="!busy && !rows.length && !error" class="muted">这天暂无可调整的出诊。</p>
-    <table v-if="rows.length">
+    <div v-if="rows.length" class="schedule-change-table">
+    <table>
       <thead><tr><th>牙医</th><th>出诊时间</th><th>操作</th></tr></thead>
       <tbody><tr v-for="row in rows" :key="row.schedule_id">
         <td>{{ row.dentist_name }}</td><td>{{ formatShanghai(row.start_at) }} 至 {{ formatShanghai(row.end_at) }}</td>
         <td><button class="secondary" :disabled="busy" @click="choose(row)">调整</button></td>
       </tr></tbody>
     </table>
+    </div>
     <form v-if="selected" class="change-form" @submit.prevent="submit(true)">
       <h3>{{ selected.dentist_name }} · {{ formatShanghai(selected.start_at) }}</h3>
       <label>处理方式 <select v-model="action" :disabled="busy"><option value="stop">撤销该时段</option><option value="shorten">提前结束</option></select></label>
@@ -117,5 +119,6 @@ onUnmounted(() => { generation++ })
 
 <style scoped>
 .schedule-change, .change-form { display: grid; gap: 12px; justify-items: start; }
+.schedule-change-table { display: contents; }
 .change-form { border-top: 1px solid var(--line); padding-top: 14px; width: 100%; }
 </style>
