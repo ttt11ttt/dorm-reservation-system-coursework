@@ -10,11 +10,11 @@
 
 | 角色 | 账号 | 密码 | 登录后可查看或办理 |
 | --- | --- | --- | --- |
-| 总部管理员 | `dental_admin` | `ELFfud8UnEL8kXqyVWPOU0LRzwM` | 全门店工作台、账号管理 |
-| 店长 | `fixture_manager` | `Hn!v_TJh36Xgwl5_iG_fKyn` | 天河店排班、调班停诊和提醒 |
-| 前台 | `fixture_front` | `Hn!5mRdkbijX4_at4yeYKwf` | 天河店预约、到诊和结算 |
-| 牙医 | `dental_dentist` | `GdC3uks_kJGa80X9mqhCfrwU5_c` | 本人接诊和复诊 |
-| 财务 | `fixture_finance` | `Hn!GjlkePBFnhSQp9unS4e2` | 天河店费用和经营报表 |
+| 总部管理员 | `dental_admin` | `123456` | 全门店工作台、账号管理 |
+| 店长 | `fixture_manager` | `123456` | 天河店排班、调班停诊和提醒 |
+| 前台 | `fixture_front` | `123456` | 天河店预约、到诊和结算 |
+| 牙医 | `dental_dentist` | `123456` | 本人接诊和复诊 |
+| 财务 | `fixture_finance` | `123456` | 天河店费用和经营报表 |
 
 这些账号供课程验收使用，办理流程时请使用虚构资料。[角色权限说明](STAFF-ROLES.md) · [门店目录接口示例](https://api.know11know.top/api/v1/catalog/clinics)
 
